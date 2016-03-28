@@ -20,7 +20,7 @@ globalVariables(c("subject_id", "result_id", "result_set_id", "experiment_title"
                   "visit_name", "visit_min_start_day", "visit_max_start_day", "visit_order", 
                   "elapsed_time_of_specimen_collection", "time_point_reference",
                   "biosample_accession", "repository_id", 
-                  "QNAM", "QVAL", "PFSPECSB", "PFPOPAR", 
+                  "QNAM", "QVAL", "PFSPECSB", "PFREFIDP", "PFPOPAR", 
                   "VISITMIN", "VISITMAX",
                   "PFSPTRT", 
                   "PFTRTAMV", "PFTRTAMU",
@@ -65,7 +65,7 @@ getGeneticsFindings <- function(data_src, study_id, assay_type="ALL") {
     if ((assay_type == "ALL") || (assay_type =="HLA Typing")) {
       # get HLA Typing results
         
-      #   hla_column_names <- c("study_id", "subject_id", "result_id", "result_set_id",
+      #   hla_column_names <- c("study_id", "subject_id", "sequence", "result_set_id",
       #                         "allele_1", "allele_2", 
       #                         "locus_name", "pop_area_name", 
       #                         "experiment_title", "assay_purpose", "measurement_technique",
@@ -85,18 +85,18 @@ getGeneticsFindings <- function(data_src, study_id, assay_type="ALL") {
                          PFTRTTMV = treatment_temperature_value, PFTRTTMU = treatment_temperature_unit,
                          VISIT = visit_name, VISITNUM = visit_order,  VISITMIN = visit_min_start_day, VISITMAX = visit_max_start_day, 
                          PFELTM = elapsed_time_of_specimen_collection, PFTPTREF = time_point_reference,
-                         PFREFID = biosample_accession )
+                         PFREFID = experiment_sample_accession, PFREFIDP = biosample_accession )
     
         hla_df$DOMAIN <- "PF"
         hla_df$PFXFN <- ""
         
-        qnam_values = c("PFSPECSB", "PFPOPAR", 
+        qnam_values = c("PFSPECSB", "PFREFIDP", "PFPOPAR", 
                         "VISITMIN", "VISITMAX",
                         "PFSPTRT", 
                         "PFTRTAMV", "PFTRTAMU",
                         "PFTRTDUV", "PFTRTDUU",
                         "PFTRTTMV", "PFTRTTMU")
-        qlabel_values= c("Specimen Subtype", "Geographic Area of the Population", 
+        qlabel_values= c("Specimen Subtype", "Source Specimen Identifier", "Geographic Area of the Population", 
                          "Planned Visit Minimum Start Day", "Planned Visit Maximum Start Day",
                          "Specimen Treatment", 
                          "Specimen Treatment Amount Value", "Specimen Treatment Amount Unit",
@@ -110,7 +110,7 @@ getGeneticsFindings <- function(data_src, study_id, assay_type="ALL") {
                                     value.name = "QVAL")
         
         supphla_df <- transform(supphla_df, QLABEL = unlist(qlabel_values[QNAM]))
-        supphla_df <- rename(supphla_df, c("DOMAIN" = "RDOMAIN", "PFSEQ" = "IDVARVAL"))
+        supphla_df <- plyr::rename(supphla_df, c("DOMAIN" = "RDOMAIN", "PFSEQ" = "IDVARVAL"))
         supphla_df$IDVAR <- "PFSEQ"
         
         
@@ -119,7 +119,7 @@ getGeneticsFindings <- function(data_src, study_id, assay_type="ALL") {
         # remove rows that have empty QVAL values
         supphla_df <- subset(supphla_df,QVAL!="")      
         
-        hla_df <- subset(hla_df, select = -c(PFSPECSB, PFPOPAR, 
+        hla_df <- subset(hla_df, select = -c(PFSPECSB, PFREFIDP, PFPOPAR, 
                                              VISITMIN, VISITMAX,
                                              PFSPTRT, 
                                              PFTRTAMV, PFTRTAMU,
@@ -153,7 +153,7 @@ getGeneticsFindings <- function(data_src, study_id, assay_type="ALL") {
       arr_df <- getArrayResults(data_src, study_id, "")
       if (nrow(arr_df) > 0) {
         arr_df <- arr_df %>% 
-          select(STUDYID = study_id, USUBJID = subject_id, PFSEQ = result_id, PFXFN = dataset_id,
+          select(STUDYID = study_id, USUBJID = subject_id, PFSEQ = sequence, PFXFN = dataset_id,
                          PFTEST = experiment_title, PFCAT = assay_purpose, PFMETHOD = measurement_technique, 
                          PFSPEC = specimen_type, PFSPECSB = specimen_subtype, 
                          PFSPTRT = specimen_treatment, 
@@ -162,20 +162,20 @@ getGeneticsFindings <- function(data_src, study_id, assay_type="ALL") {
                          PFTRTTMV = treatment_temperature_value, PFTRTTMU = treatment_temperature_unit,
                          VISIT = visit_name, VISITNUM = visit_order,  VISITMIN = visit_min_start_day, VISITMAX = visit_max_start_day, 
                          PFELTM = elapsed_time_of_specimen_collection, PFTPTREF = time_point_reference,
-                         PFREFID = biosample_accession )
+                         PFREFID = experiment_sample_accession, PFREFIDP = biosample_accession )
         arr_df$DOMAIN <- "PF"
         arr_df$PFGRPID <- ""
         arr_df$PFGENRI <- ""
         arr_df$PFORRES <- ""
         arr_df$PFALLELC <- ""
     
-        qnam_values = c("PFSPECSB",
+        qnam_values = c("PFSPECSB", "PFREFIDP",
                         "VISITMIN", "VISITMAX",
                         "PFSPTRT", 
                         "PFTRTAMV", "PFTRTAMU",
                         "PFTRTDUV", "PFTRTDUU",
                         "PFTRTTMV", "PFTRTTMU")
-        qlabel_values= c("Specimen Subtype",
+        qlabel_values= c("Specimen Subtype", "Source Specimen Identifier", 
                          "Planned Visit Minimum Start Day", "Planned Visit Maximum Start Day",
                          "Specimen Treatment", 
                          "Specimen Treatment Amount Value", "Specimen Treatment Amount Unit",
@@ -189,7 +189,7 @@ getGeneticsFindings <- function(data_src, study_id, assay_type="ALL") {
                                      value.name = "QVAL")
         
         supparr_df <- transform(supparr_df, QLABEL = unlist(qlabel_values[QNAM]))
-        supparr_df <- rename(supparr_df, c("DOMAIN" = "RDOMAIN", "PFSEQ" = "IDVARVAL"))
+        supparr_df <- plyr::rename(supparr_df, c("DOMAIN" = "RDOMAIN", "PFSEQ" = "IDVARVAL"))
         supparr_df$IDVAR <- "PFSEQ"
         
         
@@ -198,7 +198,7 @@ getGeneticsFindings <- function(data_src, study_id, assay_type="ALL") {
         # remove rows that have empty QVAL values
         supparr_df <- subset(supparr_df,QVAL!="")      
         
-        arr_df <- subset(arr_df, select = -c(PFSPECSB, PFSPTRT, 
+        arr_df <- subset(arr_df, select = -c(PFSPECSB, PFREFIDP, PFSPTRT, 
                                              VISITMIN, VISITMAX,
                                              PFTRTAMV, PFTRTAMU,
                                              PFTRTDUV, PFTRTDUU,
@@ -304,6 +304,7 @@ NULL
 ##'     \strong{QNAM} \tab \strong{QLABEL} \cr
 ##'     PFPOPAR \tab Geographic Area of the Population \cr
 ##'     PFSPECSB \tab Specimen Subtype \cr
+##'     PFREFIDP \tab Source Specimen Identifier \cr
 ##'     VISITMIN \tab Planned Visit Minimum Start Day \cr
 ##'     VISITMAX \tab Planned Visit Maximum Start Day \cr
 ##'     PFSPTRT \tab Specimen Treatment \cr

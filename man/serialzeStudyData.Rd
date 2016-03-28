@@ -11,6 +11,9 @@ serialzeStudyData(study_ids, data_dir)
 
 \item{data_dir}{Path to a file folder where the .rds study files will be saved into}
 }
+\value{
+List of study indentifiers that were serialized successfully
+}
 \description{
 Load specific studies from the database and save it in .rds format in 
 a local file directory

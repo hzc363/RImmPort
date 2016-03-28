@@ -19,7 +19,7 @@ globalVariables(c("subject_id", "experiment_title", "assay_purpose", "measuremen
                   "treatment_temperature_value", "treatment_temperature_unit",
                   "visit_name", "visit_min_start_day", "visit_max_start_day", "visit_order",
                   "elapsed_time_of_specimen_collection", "time_point_reference",
-                  "biosample_accession", "ZCSPECSB",
+                  "biosample_accession", "ZCSPECSB", "ZCREFIDP",
                   "VISITMIN", "VISITMAX",
                   "ZCSPTRT", 
                   "ZCTRTAMV", "ZCTRTAMU",
@@ -46,6 +46,7 @@ globalVariables(c("subject_id", "experiment_title", "assay_purpose", "measuremen
 ##   nq_l <- getNucleicAcidQuantification(data_src, "SDY1", "PCR")
 ## }
 ##' @importFrom dplyr select
+##' @importFrom plyr rename
 getNucleicAcidQuantification <- function(data_src, study_id, assay_type="ALL") {
   cat("loading Nucleic Acid Quantification data....")
 
@@ -77,7 +78,7 @@ getNucleicAcidQuantification <- function(data_src, study_id, assay_type="ALL") {
       
       pcr_df <- getPcrResults(data_src, study_id, "")
       if (nrow(pcr_df) > 0) {
-        pcr_df <- select(pcr_df, STUDYID = study_id, USUBJID = subject_id, ZCSEQ = result_id, ZCTEST = experiment_title, 
+        pcr_df <- select(pcr_df, STUDYID = study_id, USUBJID = subject_id, ZCSEQ = sequence, ZCTEST = experiment_title, 
                          ZCCAT = assay_purpose, ZCMETHOD = measurement_technique, 
                          ZCENTRZD = entrez_gene_id, ZCGENNAM = gene_name, ZCGENSYM = gene_symbol,
                          ZCTHRESH = threshold_cycles, ZCORRES = value_reported, ZCORRESU = unit_reported,
@@ -88,17 +89,17 @@ getNucleicAcidQuantification <- function(data_src, study_id, assay_type="ALL") {
                          ZCTRTTMV = treatment_temperature_value, ZCTRTTMU = treatment_temperature_unit,
                          VISIT = visit_name, VISITNUM = visit_order,  VISITMIN = visit_min_start_day, VISITMAX = visit_max_start_day, 
                          ZCELTM = elapsed_time_of_specimen_collection, 
-                         ZCTPTREF = time_point_reference, ZCREFID = biosample_accession) 
+                         ZCTPTREF = time_point_reference, ZCREFID = experiment_sample_accession, ZCREFIDP = biosample_accession) 
         
         pcr_df$DOMAIN <- "ZC"
         
-        qnam_values = c("ZCSPECSB",
+        qnam_values = c("ZCSPECSB", "ZCREFIDP",
                         "VISITMIN", "VISITMAX",
                         "ZCSPTRT", 
                         "ZCTRTAMV", "ZCTRTAMU",
                         "ZCTRTDUV", "ZCTRTDUU",
                         "ZCTRTTMV", "ZCTRTTMU")
-        qlabel_values= c("Specimen Subtype",
+        qlabel_values= c("Specimen Subtype", "Source Specimen Identifier",
                          "Planned Visit Minimum Start Day", "Planned Visit Maximum Start Day",
                          "Specimen Treatment", 
                          "Specimen Treatment Amount Value", "Specimen Treatment Amount Unit",
@@ -112,7 +113,7 @@ getNucleicAcidQuantification <- function(data_src, study_id, assay_type="ALL") {
                            value.name = "QVAL")
         
         supppcr_df <- transform(supppcr_df, QLABEL = unlist(qlabel_values[QNAM]))
-        supppcr_df <- rename(supppcr_df, c("DOMAIN" = "RDOMAIN", "ZCSEQ" = "IDVARVAL"))
+        supppcr_df <- plyr::rename(supppcr_df, c("DOMAIN" = "RDOMAIN", "ZCSEQ" = "IDVARVAL"))
         supppcr_df$IDVAR <- "ZCSEQ"
         
         
@@ -121,7 +122,7 @@ getNucleicAcidQuantification <- function(data_src, study_id, assay_type="ALL") {
         # remove rows that have empty QVAL values
         supppcr_df <- subset(supppcr_df,QVAL!="")      
         
-        pcr_df <- subset(pcr_df, select = -c(ZCSPECSB, ZCSPTRT, 
+        pcr_df <- subset(pcr_df, select = -c(ZCSPECSB, ZCREFIDP, ZCSPTRT, 
                                              VISITMIN, VISITMAX,
                                              ZCTRTAMV, ZCTRTAMU,
                                              ZCTRTDUV, ZCTRTDUU,
@@ -225,6 +226,7 @@ NULL
 ##'   \tabular{ll}{
 ##'     \strong{QNAM} \tab \strong{QLABEL} \cr
 ##'     ZCSPECSB \tab Specimen Subtype \cr
+##'     ZCREFIDP \tab Source Specimen Identifier \cr
 ##'     VISITMIN \tab Planned Visit Minimum Start Day \cr
 ##'     VISITMAX \tab Planned Visit Maximum Start Day \cr
 ##'     ZCSPTRT \tab Specimen Treatment \cr

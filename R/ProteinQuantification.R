@@ -19,7 +19,7 @@ globalVariables(c("subject_id", "result_id", "experiment_title", "assay_purpose"
                   "visit_name", "visit_min_start_day", "visit_max_start_day", "visit_order",
                   "elapsed_time_of_specimen_collection", "time_point_reference",
                   "biosample_accession", "file_name", "concentration_value", "concentration_unit", 
-                  "mfi", "mfi_coordinate", "QNAM", "QVAL", "ZAMFI", "ZAMFICRD", "ZASPECSB",
+                  "mfi", "mfi_coordinate", "QNAM", "QVAL", "ZAMFI", "ZAMFICRD", "ZASPECSB", "ZAREFIDP",
                   "VISITMIN", "VISITMAX",
                   "ZASPTRT", 
                   "ZATRTAMV", "ZATRTAMU",
@@ -67,7 +67,7 @@ getProteinQuantification <- function(data_src, study_id, assay_type="ALL") {
         measurement_types <- list("Protein_Quantification", "Cytokine_Quantification")
         els_df <- getElisaResults(data_src, study_id, "")
         if (nrow(els_df) > 0) {
-            els_df <- select(els_df, STUDYID = study_id, USUBJID = subject_id, ZASEQ = result_id, ZATEST = experiment_title, 
+            els_df <- select(els_df, STUDYID = study_id, USUBJID = subject_id, ZASEQ = sequence, ZATEST = experiment_title, 
                 ZACAT = assay_purpose, ZAMETHOD = measurement_technique, ZAANALYT = analyte, ZAORRES = value, ZAORRESU = unit, 
                 ZASPEC = specimen_type, ZASPECSB = specimen_subtype, 
                 ZASPTRT = specimen_treatment, 
@@ -76,18 +76,18 @@ getProteinQuantification <- function(data_src, study_id, assay_type="ALL") {
                 ZATRTTMV = treatment_temperature_value, ZATRTTMU = treatment_temperature_unit,
                 VISIT = visit_name, VISITNUM = visit_order,  VISITMIN = visit_min_start_day, VISITMAX = visit_max_start_day, 
                 ZAELTM = elapsed_time_of_specimen_collection, ZATPTREF = time_point_reference, 
-                ZAREFID = biosample_accession, ZAXFN = file_name)
+                ZAREFID = experiment_sample_accession, ZAREFIDP = biosample_accession, ZAXFN = file_name)
             
             els_df$DOMAIN <- "ZA"
 
-            qnam_values = c("ZASPECSB",
+            qnam_values = c("ZASPECSB", "ZAREFIDP",
                             "VISITMIN", "VISITMAX",
                             "ZASPTRT", 
                             "ZATRTAMV", "ZATRTAMU",
                             "ZATRTDUV", "ZATRTDUU",
                             "ZATRTTMV", "ZATRTTMU")
             
-            qlabel_values= c("Specimen Subtype",
+            qlabel_values= c("Specimen Subtype", "Source Specimen Identifier",
                              "Planned Visit Minimum Start Day", "Planned Visit Maximum Start Day",
                              "Specimen Treatment", 
                              "Specimen Treatment Amount Value", "Specimen Treatment Amount Unit",
@@ -100,7 +100,7 @@ getProteinQuantification <- function(data_src, study_id, assay_type="ALL") {
                                  variable.name = "QNAM", 
                                  value.name = "QVAL")
             supp_els_df <- transform(supp_els_df, QLABEL = unlist(qlabel_values[QNAM]))
-            supp_els_df <- rename(supp_els_df, c("DOMAIN" = "RDOMAIN", "ZASEQ" = "IDVARVAL"))
+            supp_els_df <- plyr::rename(supp_els_df, c("DOMAIN" = "RDOMAIN", "ZASEQ" = "IDVARVAL"))
             supp_els_df$IDVAR <- "ZASEQ"
             
             supp_els_df <- supp_els_df[supppq_cols]
@@ -108,7 +108,7 @@ getProteinQuantification <- function(data_src, study_id, assay_type="ALL") {
             # remove rows that have empty QVAL values
             supp_els_df <- subset(supp_els_df,QVAL!="")      
             
-            els_df <- subset(els_df, select = -c(ZASPECSB, ZASPTRT, 
+            els_df <- subset(els_df, select = -c(ZASPECSB, ZAREFIDP, ZASPTRT, 
                                                  VISITMIN, VISITMAX,
                                                  ZATRTAMV, ZATRTAMU,
                                                  ZATRTDUV, ZATRTDUU,
@@ -134,7 +134,7 @@ getProteinQuantification <- function(data_src, study_id, assay_type="ALL") {
         mbaa_df <- getMbaaResults(data_src, study_id, "")
         if (nrow(mbaa_df) > 0) {
             mbaa_df <- mbaa_df %>% 
-              select(STUDYID = study_id, USUBJID = subject_id, ZASEQ = result_id, ZATEST = experiment_title, 
+              select(STUDYID = study_id, USUBJID = subject_id, ZASEQ = sequence, ZATEST = experiment_title, 
                 ZACAT = assay_purpose, ZAMETHOD = measurement_technique, ZAANALYT = analyte, ZAORRES = concentration_value, 
                 ZAORRESU = concentration_unit, ZASPEC = specimen_type, ZASPECSB = specimen_subtype, 
                 ZASPTRT = specimen_treatment, 
@@ -144,18 +144,19 @@ getProteinQuantification <- function(data_src, study_id, assay_type="ALL") {
                 VISIT = visit_name, VISITNUM = visit_order,  VISITMIN = visit_min_start_day, VISITMAX = visit_max_start_day, 
                 ZAELTM = elapsed_time_of_specimen_collection, 
                 ZATPTREF = time_point_reference, 
-                ZAREFID = biosample_accession, ZAXFN = file_name, ZAMFI = mfi, ZAMFICRD = mfi_coordinate)
+                ZAREFID = experiment_sample_accession, ZAREFIDP = biosample_accession, 
+                ZAXFN = file_name, ZAMFI = mfi, ZAMFICRD = mfi_coordinate)
             
             mbaa_df$DOMAIN <- "ZA"
             
-            qnam_values = c("ZAMFI", "ZAMFICRD", "ZASPECSB",
+            qnam_values = c("ZAMFI", "ZAMFICRD", "ZASPECSB", "ZAREFIDP",
                             "VISITMIN", "VISITMAX",
                             "ZASPTRT", 
                             "ZATRTAMV", "ZATRTAMU",
                             "ZATRTDUV", "ZATRTDUU",
                             "ZATRTTMV", "ZATRTTMU")
             
-            qlabel_values= c("MFI", "MFI Coordinate", "Specimen Subtype",
+            qlabel_values= c("MFI", "MFI Coordinate", "Specimen Subtype", "Source Specimen Identifier",
                              "Planned Visit Minimum Start Day", "Planned Visit Maximum Start Day",
                              "Specimen Treatment", 
                              "Specimen Treatment Amount Value", "Specimen Treatment Amount Unit",
@@ -168,7 +169,7 @@ getProteinQuantification <- function(data_src, study_id, assay_type="ALL") {
                                            variable.name = "QNAM", 
                                            value.name = "QVAL")
             supp_mbaa_df <- transform(supp_mbaa_df, QLABEL = unlist(qlabel_values[QNAM]))
-            supp_mbaa_df <- rename(supp_mbaa_df, c("DOMAIN" = "RDOMAIN", "ZASEQ" = "IDVARVAL"))
+            supp_mbaa_df <- plyr::rename(supp_mbaa_df, c("DOMAIN" = "RDOMAIN", "ZASEQ" = "IDVARVAL"))
             supp_mbaa_df$IDVAR <- "ZASEQ"
             
             supp_mbaa_df <- supp_mbaa_df[supppq_cols]
@@ -176,7 +177,7 @@ getProteinQuantification <- function(data_src, study_id, assay_type="ALL") {
             # remove rows that have empty QVAL values
             supp_mbaa_df <- subset(supp_mbaa_df,QVAL!="")      
             
-            mbaa_df <- subset(mbaa_df, select = -c(ZAMFI, ZAMFICRD, ZASPECSB, 
+            mbaa_df <- subset(mbaa_df, select = -c(ZAMFI, ZAMFICRD, ZASPECSB, ZAREFIDP,
                                                    VISITMIN, VISITMAX,
                                                    ZASPTRT, 
                                                    ZATRTAMV, ZATRTAMU,
@@ -284,6 +285,7 @@ NULL
 ##'     ZAMFI \tab MFI \cr
 ##'     ZAMFICRD \tab MFI Coordinate \cr
 ##'     ZASPECSB \tab Specimen Subtype \cr
+##'     ZAREFIDP \tab Source Specimen Identifier \cr
 ##'     VISITMIN \tab Planned Visit Minimum Start Day \cr
 ##'     VISITMAX \tab Planned Visit Maximum Start Day \cr
 ##'     ZASPTRT \tab Specimen Treatment \cr

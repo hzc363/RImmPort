@@ -11,7 +11,7 @@ NULL
 
 # call to globalVariables to prevent from generating NOTE: no visible binding for global variable <variable name>
 # this hack is to satisfy CRAN (http://stackoverflow.com/questions/9439256/how-can-i-handle-r-cmd-check-no-visible-binding-for-global-variable-notes-when)
-globalVariables(c("subject_id", "result_id", "experiment_title", "assay_purpose", "measurement_technique",
+globalVariables(c("subject_id", "sequence", "experiment_title", "assay_purpose", "measurement_technique",
                   "virus_strain", "result_in_original_units", "original_units",
                   "specimen_type", "specimen_subtype", "specimen_treatment", 
                   "treatment_amount_value", "treatment_amount_unit",
@@ -19,7 +19,7 @@ globalVariables(c("subject_id", "result_id", "experiment_title", "assay_purpose"
                   "treatment_temperature_value", "treatment_temperature_unit",
                   "visit_name", "visit_min_start_day", "visit_max_start_day", "visit_order",
                   "elapsed_time_of_specimen_collection", "time_point_reference",
-                  "biosample_accession", "ZDSPECSB",
+                  "biosample_accession", "ZDSPECSB", "ZDREFIDP",
                   "VISITMIN", "VISITMAX",
                   "ZDSPTRT", 
                   "ZDTRTAMV", "ZDTRTAMU",
@@ -45,6 +45,7 @@ globalVariables(c("subject_id", "result_id", "experiment_title", "assay_purpose"
 #   # get study SDY1's Titer Assay data that was generated using HAI assay
 #   ta_l <- getTiterAssayResults(data_src, "SDY1", "HAI")
 # }
+#' @importFrom plyr rename
 getTiterAssayResults <- function(data_src, study_id, assay_type="ALL") {
   cat("loading Titer Assay Results data....")
   
@@ -62,7 +63,7 @@ getTiterAssayResults <- function(data_src, study_id, assay_type="ALL") {
     if ((assay_type == "ALL") || (assay_type =="HAI")) {
       # get HAI results
       
-      #   hai_assay_column_names <- c("study_id", "subject_id", "result_id",
+      #   hai_assay_column_names <- c("study_id", "subject_id", "sequence",
       #                               "result_in_original_units", "original_units", 
       #                               "experiment_title", "assay_purpose", "measurement_technique",
       #                               "biosample_accession", "specimen_type", "specimen_subtype",
@@ -72,7 +73,7 @@ getTiterAssayResults <- function(data_src, study_id, assay_type="ALL") {
   
       hai_df <- getHaiResults(data_src, study_id, "")
       if (nrow(hai_df) > 0) {
-        hai_df <- select(hai_df, STUDYID = study_id, USUBJID = subject_id, ZDSEQ = result_id, ZDTEST = experiment_title, 
+        hai_df <- select(hai_df, STUDYID = study_id, USUBJID = subject_id, ZDSEQ = sequence, ZDTEST = experiment_title, 
                           ZDCAT = assay_purpose, ZDMETHOD = measurement_technique, ZDSTRAIN = virus_strain, 
                           ZDORRES = result_in_original_units, ZDORRESU = original_units,  
                           ZDSPEC = specimen_type, ZDSPECSB = specimen_subtype, 
@@ -82,17 +83,17 @@ getTiterAssayResults <- function(data_src, study_id, assay_type="ALL") {
                            ZDTRTTMV = treatment_temperature_value, ZDTRTTMU = treatment_temperature_unit,
                           VISIT = visit_name, VISITNUM = visit_order,  VISITMIN = visit_min_start_day, VISITMAX = visit_max_start_day, 
                           ZDELTM = elapsed_time_of_specimen_collection, ZDTPTREF = time_point_reference, 
-                          ZDREFID = biosample_accession)
+                          ZDREFID = experiment_sample_accession, ZDREFIDP = biosample_accession)
         
         hai_df$DOMAIN <- "ZD"
         
-        qnam_values = c("ZDSPECSB",
+        qnam_values = c("ZDSPECSB", "ZDREFIDP",
                         "VISITMIN", "VISITMAX",
                         "ZDSPTRT", 
                         "ZDTRTAMV", "ZDTRTAMU",
                         "ZDTRTDUV", "ZDTRTDUU",
                         "ZDTRTTMV", "ZDTRTTMU")
-        qlabel_values= c("Specimen Subtype",
+        qlabel_values= c("Specimen Subtype", "Source Specimen Identifier",
                          "Planned Visit Minimum Start Day", "Planned Visit Maximum Start Day",
                          "Specimen Treatment", 
                          "Specimen Treatment Amount Value", "Specimen Treatment Amount Unit",
@@ -115,7 +116,7 @@ getTiterAssayResults <- function(data_src, study_id, assay_type="ALL") {
         # remove rows that have empty QVAL values
         supphai_df <- subset(supphai_df,QVAL!="")      
         
-        hai_df <- subset(hai_df, select = -c(ZDSPECSB, 
+        hai_df <- subset(hai_df, select = -c(ZDSPECSB, ZDREFIDP,
                                              VISITMIN, VISITMAX,
                                              ZDSPTRT, 
                                              ZDTRTAMV, ZDTRTAMU,
@@ -135,7 +136,7 @@ getTiterAssayResults <- function(data_src, study_id, assay_type="ALL") {
       
       nat_df <- getNeutAbTiterResults(data_src, study_id, "")
       if (nrow(nat_df) > 0) {
-        nat_df <- select(nat_df, STUDYID = study_id, USUBJID = subject_id, ZDSEQ = result_id, ZDTEST = experiment_title, 
+        nat_df <- select(nat_df, STUDYID = study_id, USUBJID = subject_id, ZDSEQ = sequence, ZDTEST = experiment_title, 
                          ZDCAT = assay_purpose, ZDMETHOD = measurement_technique, ZDSTRAIN = virus_strain, 
                          ZDORRES = result_in_original_units, ZDORRESU = original_units,  
                          ZDSPEC = specimen_type, ZDSPECSB = specimen_subtype, 
@@ -145,17 +146,17 @@ getTiterAssayResults <- function(data_src, study_id, assay_type="ALL") {
                          ZDTRTTMV = treatment_temperature_value, ZDTRTTMU = treatment_temperature_unit,
                          VISIT = visit_name, VISITNUM = visit_order,  VISITMIN = visit_min_start_day, VISITMAX = visit_max_start_day, 
                          ZDELTM = elapsed_time_of_specimen_collection, ZDTPTREF = time_point_reference, 
-                        ZDREFID = biosample_accession)
+                         ZDREFID = experiment_sample_accession, ZDREFIDP = biosample_accession)
         
         nat_df$DOMAIN <- "ZD"
 
-        qnam_values = c("ZDSPECSB",
+        qnam_values = c("ZDSPECSB", "ZDREFIDP",
                         "VISITMIN", "VISITMAX",
                         "ZDSPTRT", 
                         "ZDTRTAMV", "ZDTRTAMU",
                         "ZDTRTDUV", "ZDTRTDUU",
                         "ZDTRTTMV", "ZDTRTTMU")
-        qlabel_values= c("Specimen Subtype",
+        qlabel_values= c("Specimen Subtype", "Source Specimen Identifier",
                          "Planned Visit Minimum Start Day", "Planned Visit Maximum Start Day",
                          "Specimen Treatment", 
                          "Specimen Treatment Amount Value", "Specimen Treatment Amount Unit",
@@ -178,7 +179,7 @@ getTiterAssayResults <- function(data_src, study_id, assay_type="ALL") {
         # remove rows that have empty QVAL values
         suppnat_df <- subset(suppnat_df,QVAL!="")      
         
-        nat_df <- subset(nat_df, select = -c(ZDSPECSB, 
+        nat_df <- subset(nat_df, select = -c(ZDSPECSB, ZDREFIDP,
                                              VISITMIN, VISITMAX,
                                              ZDSPTRT, 
                                              ZDTRTAMV, ZDTRTAMU,
@@ -288,6 +289,7 @@ NULL
 ##'   \tabular{ll}{
 ##'     \strong{QNAM} \tab \strong{QLABEL} \cr
 ##'     ZDSPECSB \tab Specimen Subtype \cr
+##'     ZDREFIDP \tab Source Specimen Identifier \cr
 ##'     VISITMIN \tab Planned Visit Minimum Start Day \cr
 ##'     VISITMAX \tab Planned Visit Maximum Start Day \cr
 ##'     ZDSPTRT \tab Specimen Treatment \cr

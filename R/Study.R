@@ -39,6 +39,7 @@ domain_info <- structure(data.frame(
 ##' 
 ##' @param data_src A connection handle to ImmPort (MySQL or SQLite) database instance or 
 ##' a directory handle to folder where study RImmPort-formatted (.rds) files located
+##' @return 1 if successful
 ##' @examples
 ##' library(DBI)
 ##' library(sqldf)
@@ -46,6 +47,7 @@ domain_info <- structure(data.frame(
 ##' db_dir <- file.path(studies_dir, "Db")
 ##' sqlite_conn <- dbConnect(SQLite(), dbname=file.path(db_dir, "ImmPort.sqlite"))
 ##' setImmPortDataSource(sqlite_conn)
+##' @importFrom utils unzip
 ##' @export
 setImmPortDataSource <- function(data_src){
   RImmPort.env$data_src <- data_src
@@ -60,6 +62,8 @@ setImmPortDataSource <- function(data_src){
       unzip(file.path(data_src, zf), exdir = data_src)
     }
   }
+  
+  return(1)
 }
 
 ##' Special Purpose class
@@ -364,9 +368,15 @@ Study <- setRefClass("Study", fields = list(
 ##' sdy139 <- getStudy("SDY139")
 ##' @export
 getStudy <- function(study_id) {
-  if (is.null(r <- get0("data_src", envir = RImmPort.env))) {
+  if (exists("data_src", envir = RImmPort.env)) {
+    r <- get("data_src", envir = RImmPort.env)
+  } else {
     stop("ImmPort data source is not set: See ?setImmPortDataSource() ")
   }
+  
+#   if (is.null(r <- get0("data_src", envir = RImmPort.env))) {
+#     stop("ImmPort data source is not set: See ?setImmPortDataSource() ")
+#   }
   
   data_src <- RImmPort.env$data_src
   
@@ -426,9 +436,15 @@ getDomainCode <- function(domain) {
 ##' dm_df <- getDomainDataOfStudies("Demographics", "SDY139")
 ##' @export
 getDomainDataOfStudies <- function(domain, study_ids) {
-  if (is.null(r <- get0("data_src", envir = RImmPort.env))) {
+  if (exists("data_src", envir = RImmPort.env)) {
+    r <- get("data_src", envir = RImmPort.env)
+  } else {
     stop("ImmPort data source is not set: See ?setImmPortDataSource() ")
   }
+
+#   if (is.null(r <- get0("data_src", envir = RImmPort.env))) {
+#     stop("ImmPort data source is not set: See ?setImmPortDataSource() ")
+#   }
   
   data_src <- RImmPort.env$data_src
   
@@ -971,9 +987,15 @@ getListOfAssayTypes <- function() {
 ##' head(elispot_l$zb_df)
 ##' @export
 getAssayDataOfStudies <- function(study_ids, assay_type) {
-  if (is.null(r <- get0("data_src", envir = RImmPort.env))) {
+  if (exists("data_src", envir = RImmPort.env)) {
+    r <- get("data_src", envir = RImmPort.env)
+  } else {
     stop("ImmPort data source is not set: See ?setImmPortDataSource() ")
   }
+  
+#   if (is.null(r <- get0("data_src", envir = RImmPort.env))) {
+#     stop("ImmPort data source is not set: See ?setImmPortDataSource() ")
+#   }
   
   data_src <- RImmPort.env$data_src
   
@@ -1012,9 +1034,15 @@ getAssayDataOfStudies <- function(study_ids, assay_type) {
 getStudiesWithSpecificDomainData <- function(domain, all_study_ids = c("ALL")) {
   study_ids = c()
   
-  if (is.null(r <- get0("data_src", envir = RImmPort.env))) {
+  if (exists("data_src", envir = RImmPort.env)) {
+    r <- get("data_src", envir = RImmPort.env)
+  } else {
     stop("ImmPort data source is not set: See ?setImmPortDataSource() ")
   }
+  
+  #   if (is.null(r <- get0("data_src", envir = RImmPort.env))) {
+  #     stop("ImmPort data source is not set: See ?setImmPortDataSource() ")
+  #   }
   
   data_src <- RImmPort.env$data_src
   
@@ -1406,9 +1434,15 @@ getStudiesWithTiterAssayResults <- function(data_src) {
 ##' study_ids <- getStudiesWithSpecificAssayData("ELISPOT")
 ##' @export
 getStudiesWithSpecificAssayData <- function(assay_type, all_study_ids = c("ALL")) {
-  if (is.null(r <- get0("data_src", envir = RImmPort.env))) {
+  if (exists("data_src", envir = RImmPort.env)) {
+    r <- get("data_src", envir = RImmPort.env)
+  } else {
     stop("ImmPort data source is not set: See ?setImmPortDataSource() ")
   }
+  
+  #   if (is.null(r <- get0("data_src", envir = RImmPort.env))) {
+  #     stop("ImmPort data source is not set: See ?setImmPortDataSource() ")
+  #   }
   
   data_src <- RImmPort.env$data_src
   
@@ -1455,9 +1489,15 @@ getStudiesWithSpecificAssayData <- function(assay_type, all_study_ids = c("ALL")
 ##' study_ids <- getListOfStudies()
 ##' @export
 getListOfStudies <- function() {
-  if (is.null(r <- get0("data_src", envir = RImmPort.env))) {
+  if (exists("data_src", envir = RImmPort.env)) {
+    r <- get("data_src", envir = RImmPort.env)
+  } else {
     stop("ImmPort data source is not set: See ?setImmPortDataSource() ")
   }
+  
+  #   if (is.null(r <- get0("data_src", envir = RImmPort.env))) {
+  #     stop("ImmPort data source is not set: See ?setImmPortDataSource() ")
+  #   }
   
   data_src <- RImmPort.env$data_src
   if ((class(data_src)[1] == 'MySQLConnection') || 
@@ -1538,6 +1578,7 @@ mergeDomainAndSupplemental <- function(data_list) {
 ##' 
 ##' @param study_ids List of study indentifiers
 ##' @param data_dir Path to a file folder where the .rds study files will be saved into
+##' @return List of study indentifiers that were serialized successfully
 ##' @examples
 ##' library(DBI)
 ##' library(sqldf)
@@ -1551,9 +1592,15 @@ mergeDomainAndSupplemental <- function(data_list) {
 ##' serialzeStudyData(study_ids, rds_dir)
 ##' @export
 serialzeStudyData  <- function(study_ids, data_dir) {
-  if (is.null(r <- get0("data_src", envir = RImmPort.env))) {
+  if (exists("data_src", envir = RImmPort.env)) {
+    r <- get("data_src", envir = RImmPort.env)
+  } else {
     stop("ImmPort data source is not set: See ?setImmPortDataSource() ")
   }
+  
+  #   if (is.null(r <- get0("data_src", envir = RImmPort.env))) {
+  #     stop("ImmPort data source is not set: See ?setImmPortDataSource() ")
+  #   }
   
   data_src <- RImmPort.env$data_src
   
@@ -1572,6 +1619,8 @@ serialzeStudyData  <- function(study_ids, data_dir) {
       }
     } # next domain
   } # next study_id
+  
+  study_ids
 }
 
 ##' Load the Serialized Data of a Study
@@ -1621,6 +1670,10 @@ loadSerializedStudyData <- function(data_dir, study_id, domain) {
 covertElaspsedTimeToISO8601Format <- function(time, time_unit) {
   if (is.na(time) | is.na(time_unit)) 
     return(NA)
+  
+  if (is.null(time) |is.null(time_unit))
+    return(NULL)
+  
   
   if (time_unit %in% c("Years", "Months", "Days")) {
     if (time < 0) {

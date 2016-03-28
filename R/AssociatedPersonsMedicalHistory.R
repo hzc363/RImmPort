@@ -32,7 +32,7 @@ globalVariables(c("APID", "MHSEQ", "RSUBJID", "SREL"))
 # }
 #' @importFrom DBI dbGetQuery
 #' @importFrom plyr .
-#' @importFrom data.table as.data.table is.data.table := .N
+#' @importFrom data.table as.data.table is.data.table := .N .SD
 getAssociatedPersonsMedicalHistory <- function(data_src, study_id) {
   cat("loading Associated Persons Medical History data....")
 

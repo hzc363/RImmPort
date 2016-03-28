@@ -173,6 +173,7 @@ db_idx_stmts <- c(
 ##' 
 ##' @param data_dir File directory where the study TSV files are stored
 ##' @param db_dir File directory where the sqlite database will be stored
+##' @return The SQLite database name
 ##' @examples
 ##' studies_dir <- system.file("extdata", "ImmPortStudies", package = "RImmPort")
 ##' # set tab_dir to the folder where the zip files are located
@@ -180,13 +181,15 @@ db_idx_stmts <- c(
 ##' # set db_dir to the folder where the database file 'ImmPort.sqlite' should be stored
 ##' db_dir <- file.path(studies_dir, "Db")
 ##' # build a new ImmPort SQLite database with the data in the downloaded zip files
-##' # buildNewSqliteDb(tab_dir, db_dir) 
+##' # dbname <- buildNewSqliteDb(tab_dir, db_dir) 
 ##' @importFrom DBI dbGetQuery dbConnect
 ##' @importFrom RSQLite SQLite
 ##' @importFrom RSQLite dbWriteTable
 ##' @importFrom sqldf sqldf
 ##' @importFrom tools file_path_sans_ext
 ##' @importFrom data.table setnames
+##' @importFrom utils unzip
+##' @importFrom utils read.table
 ##' @export
 ##' 
 buildNewSqliteDb <- function(data_dir, db_dir) {
@@ -317,5 +320,6 @@ buildNewSqliteDb <- function(data_dir, db_dir) {
     dbGetQuery(db, i)
   }
   
+  dbname
 }
 
