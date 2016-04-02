@@ -3,7 +3,7 @@
 globalVariables(c("study_time_of_specimen_collection", "unit_of_study_time_of_specimen_collection",
                   "study_time_t0_event", "study_time_t0_event_specify"))
 
-
+#' @importFrom stats aggregate
 getFcsResults <- function(conn,study_id, measurement_types) {
   cat("loading FCS Results data....")
   
