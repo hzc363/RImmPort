@@ -24,6 +24,7 @@
     VISIT \tab Visit Name \cr
     PFELTM \tab Planned Elapsed Time from Time Point Ref \cr
     PFTPTREF \tab Time Point Reference
+    PFXFN \tab Raw Data File or Life Science Identifier
   }
 }
 }
