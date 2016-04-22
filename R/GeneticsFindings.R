@@ -278,7 +278,7 @@ getCountOfGeneticsFindings <- function(data_src, study_id, assay_type="ALL") {
 ##'     VISITNUM \tab Visit Number \cr
 ##'     VISIT \tab Visit Name \cr
 ##'     PFELTM \tab Planned Elapsed Time from Time Point Ref \cr
-##'     PFTPTREF \tab Time Point Reference
+##'     PFTPTREF \tab Time Point Reference \cr
 ##'     PFXFN \tab Raw Data File or Life Science Identifier
 ##'   }
 ##' }
