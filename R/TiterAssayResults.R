@@ -19,7 +19,7 @@ globalVariables(c("subject_id", "sequence", "experiment_title", "assay_purpose",
                   "treatment_temperature_value", "treatment_temperature_unit",
                   "visit_name", "visit_min_start_day", "visit_max_start_day", "visit_order",
                   "elapsed_time_of_specimen_collection", "time_point_reference",
-                  "biosample_accession", "ZDSPECSB", "ZDREFIDP",
+                  "biosample_accession","experiment_sample_accession", "ZDSPECSB", "ZDREFIDP",
                   "VISITMIN", "VISITMAX",
                   "ZDSPTRT", 
                   "ZDTRTAMV", "ZDTRTAMU",
@@ -253,11 +253,9 @@ getCountOfTiterAssayResults <- function(data_src, study_id, assay_type="ALL") {
 ##'     ZDTEST \tab Titer Assay Results Test Name \cr
 ##'     ZDCAT \tab Category for Titer Assay Results \cr
 ##'     ZDMETHOD \tab Measurement Technique \cr
-##'     ZDPOPDEF \tab Cell Population Definition \cr
-##'     ZDPOPNAM \tab Cell Population Name \cr
+##'     ZDSTRAIN \tab Virus Strain \cr
 ##'     ZDORRES \tab Result or Finding in Original Units \cr
 ##'     ZDORRESU \tab Original Units \cr
-##'     ZDBASPOP \tab Base Parent Population \cr
 ##'     ZDSPEC \tab Specimen Type \cr
 ##'     ZDREFID \tab Specimen Identifier \cr
 ##'     VISITNUM \tab Visit Number \cr

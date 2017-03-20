@@ -12,8 +12,6 @@ Special Purpose class
 
 \describe{
 \item{\code{dm_l}}{Demographics data \code{\link{DM}} and supplemental Demographics data \code{\link{SUPP}}}
-
-\item{\code{sv_l}}{Subject Visits data \code{\link{SV}} and supplemental Subject Visits data \code{\link{SUPP}}}
 }}
 \examples{
 library(DBI)

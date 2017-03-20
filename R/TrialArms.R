@@ -32,10 +32,9 @@ getTrialArms <- function(data_src, study_id) {
                         ac.arm_accession,
                         ac.name as arm_name,
                         ac.description as arm_description,
-                        ac.population_selection_rule as population_selection_rule
+                        ac.description as population_selection_rule
                       FROM arm_or_cohort ac
-                      WHERE ac.study_accession in ('", study_id, "')
-                      ORDER BY ac.sort_order", sep = "")
+                      WHERE ac.study_accession in ('", study_id, "')", sep = "")
     
     if ((class(data_src)[1] == 'MySQLConnection') || 
         (class(data_src)[1] == 'SQLiteConnection')) {

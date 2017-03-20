@@ -35,23 +35,28 @@ getQuestionnaires <- function(data_src, study_id) {
   
   
   sql_stmt <- paste("SELECT distinct
-                    asm.study_accession,
-                    \"QS\" as domain,
-                    asm.subject_accession,
-                    cast(0 as UNSIGNED INTEGER) as seq,
-                    asm.component_name_reported,
-                    asm.panel_name_reported,
-                    asm.result_value_reported,
-                    asm.result_unit_reported,
-                    pv.order_number,
-                    pv.visit_name,
-                    asm.study_day                    
-                    FROM  assessment asm, planned_visit pv
-                    WHERE asm.study_accession in ('", study_id, "') AND 
-                      (asm.assessment_type='Questionnaire' OR asm.assessment_type='Questionaire') AND
-                      (asm.planned_visit_accession = pv.planned_visit_accession) 
-                    ORDER BY asm.subject_accession", sep = "")
-  
+                      asmp.study_accession,
+                      \"QS\" as domain,
+                      asmc.subject_accession,
+                      cast(0 as UNSIGNED INTEGER) as seq,
+                      asmc.name_reported,
+                      asmp.name_reported,
+                      asmc.result_value_reported,
+                      asmc.result_unit_reported,
+                      pv.order_number,
+                      pv.name,
+                      asmc.study_day                    
+                      FROM  assessment_component asmc
+                      INNER JOIN
+                      assessment_panel asmp ON asmc.assessment_panel_accession=asmp.assessment_panel_accession
+                      INNER JOIN
+                      planned_visit pv ON asmc.planned_visit_accession=pv.planned_visit_accession
+                      WHERE (asmp.study_accession in ('", study_id, "')) AND 
+                      (asmp.assessment_type='Questionnaire' OR asmp.assessment_type='Questionaire') 
+                      ORDER BY asmc.subject_accession", sep = "")
+
+
+
   if ((class(data_src)[1] == 'MySQLConnection') || 
       (class(data_src)[1] == 'SQLiteConnection')) {
     qs_df <- dbGetQuery(data_src, statement = sql_stmt)
@@ -95,9 +100,11 @@ getQuestionnaires <- function(data_src, study_id) {
 # }
 getCountOfQuestionnaires <- function(conn, study_id) {
   sql_stmt <- paste("SELECT count(*)
-                    FROM  assessment asm
-                    WHERE asm.study_accession in ('", study_id, "') AND 
-                      (asm.assessment_type='Questionnaire' OR asm.assessment_type='Questionaire')", sep = "")
+                      FROM  assessment_component asmc
+                      INNER JOIN
+                      assessment_panel asmp ON asmc.assessment_panel_accession=asmp.assessment_panel_accession 
+                      WHERE (asmp.study_accession in ('", study_id, "')) AND 
+                      (asmp.assessment_type='Questionnaire' OR asmp.assessment_type='Questionaire')", sep = "")
   
   count <- dbGetQuery(conn, statement = sql_stmt)
   

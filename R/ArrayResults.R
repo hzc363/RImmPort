@@ -27,14 +27,14 @@ getArrayResults <- function(conn, study_id, measurement_type) {
                     bs.subject_accession,
                     cast(0 as UNSIGNED INTEGER) as sequence,
                     fi.name as dataset_id,
-                    ex.title,
+                    ex.name,
                     ex.purpose,
                     ex.measurement_technique,
-                    bs2es.expsample_accession,
+                    es2bs.expsample_accession,
                     bs.biosample_accession, 
                     bs.type,
                     bs.subtype,
-                    pv.visit_name,
+                    pv.name,
                     pv.min_start_day,
                     pv.max_start_day,
                     pv.order_number,
@@ -45,13 +45,15 @@ getArrayResults <- function(conn, study_id, measurement_type) {
                     FROM  
                     biosample bs
                     INNER JOIN
-                    biosample_2_expsample bs2es ON bs.biosample_accession=bs2es.biosample_accession
+                    expsample_2_biosample es2bs ON bs.biosample_accession=es2bs.biosample_accession
+                    INNER JOIN
+                    expsample es ON es2bs.expsample_accession=es.expsample_accession
                     INNER JOIN
                     planned_visit pv ON bs.planned_visit_accession=pv.planned_visit_accession
                     INNER JOIN
-                    experiment ex ON bs2es.experiment_accession=ex.experiment_accession
+                    experiment ex ON es.experiment_accession=ex.experiment_accession
                     INNER JOIN
-                    expsample_2_file_info es2fi ON bs2es.expsample_accession=es2fi.expsample_accession
+                    expsample_2_file_info es2fi ON es2bs.expsample_accession=es2fi.expsample_accession
                     INNER JOIN
                     file_info fi ON es2fi.file_info_id=fi.file_info_id                    
                     WHERE 
@@ -70,14 +72,14 @@ getArrayResults <- function(conn, study_id, measurement_type) {
                          bs.subject_accession,
                          cast(0 as UNSIGNED INTEGER) as sequence,
                          e2r.repository_accession as dataset_id,
-                         ex.title,
+                         ex.name,
                          ex.purpose,
                          ex.measurement_technique,
-                         bs2es.expsample_accession,
+                         es2bs.expsample_accession,
                          bs.biosample_accession, 
                          bs.type,
                          bs.subtype,
-                         pv.visit_name,
+                         pv.name,
                          pv.min_start_day,
                          pv.max_start_day,
                          pv.order_number,
@@ -88,13 +90,15 @@ getArrayResults <- function(conn, study_id, measurement_type) {
                       FROM  
                         biosample bs
                       INNER JOIN
-                      biosample_2_expsample bs2es ON bs.biosample_accession=bs2es.biosample_accession
+                      expsample_2_biosample es2bs ON bs.biosample_accession=es2bs.biosample_accession
+                      INNER JOIN
+                      expsample es ON es2bs.expsample_accession=es.expsample_accession
                       INNER JOIN
                       planned_visit pv ON bs.planned_visit_accession=pv.planned_visit_accession
                       INNER JOIN
-                      experiment ex ON bs2es.experiment_accession=ex.experiment_accession
+                      experiment ex ON es.experiment_accession=ex.experiment_accession
                       INNER JOIN
-                      expsample_public_repository e2r ON bs2es.expsample_accession=e2r.expsample_accession
+                      expsample_public_repository e2r ON es2bs.expsample_accession=e2r.expsample_accession
                       WHERE 
                       bs.study_accession in (\'", study_id,"\') AND
                       e2r.repository_name='GEO' 
@@ -109,14 +113,14 @@ getArrayResults <- function(conn, study_id, measurement_type) {
                         bs.subject_accession,
                         cast(0 as UNSIGNED INTEGER) as sequence,
                         fi.name as dataset_id,
-                        ex.title,
+                        ex.name,
                         ex.purpose,
                         ex.measurement_technique,
-                        bs2es.expsample_accession,
+                        es2bs.expsample_accession,
                         bs.biosample_accession, 
                         bs.type,
                         bs.subtype,
-                        pv.visit_name,
+                        pv.name,
                         pv.min_start_day,
                         pv.max_start_day,
                         pv.order_number,
@@ -127,13 +131,15 @@ getArrayResults <- function(conn, study_id, measurement_type) {
                         FROM  
                         biosample bs
                         INNER JOIN
-                        biosample_2_expsample bs2es ON bs.biosample_accession=bs2es.biosample_accession
+                        expsample_2_biosample es2bs ON bs.biosample_accession=es2bs.biosample_accession
+                        INNER JOIN
+                        expsample es ON es2bs.expsample_accession=es.expsample_accession
                         INNER JOIN
                         planned_visit pv ON bs.planned_visit_accession=pv.planned_visit_accession
                         INNER JOIN
-                        experiment ex ON bs2es.experiment_accession=ex.experiment_accession
+                        experiment ex ON es.experiment_accession=ex.experiment_accession
                         INNER JOIN
-                        expsample_2_file_info es2fi ON bs2es.expsample_accession=es2fi.expsample_accession
+                        expsample_2_file_info es2fi ON es2bs.expsample_accession=es2fi.expsample_accession
                         INNER JOIN
                         file_info fi ON es2fi.file_info_id=fi.file_info_id                    
                         WHERE 
@@ -158,7 +164,7 @@ getArrayResults <- function(conn, study_id, measurement_type) {
       
       sql_stmt <- paste("
                       SELECT distinct
-                        bs2es.expsample_accession,
+                        es2bs.expsample_accession,
                         tr.name,
                         tr.amount_value,
                         tr.amount_unit,
@@ -169,9 +175,9 @@ getArrayResults <- function(conn, study_id, measurement_type) {
                       FROM  
                         biosample bs
                       INNER JOIN
-                        biosample_2_expsample bs2es ON bs.biosample_accession=bs2es.biosample_accession
+                        expsample_2_biosample es2bs ON bs.biosample_accession=es2bs.biosample_accession
                       INNER JOIN
-                        expsample_2_treatment es2tr ON bs2es.expsample_accession=es2tr.expsample_accession
+                        expsample_2_treatment es2tr ON es2bs.expsample_accession=es2tr.expsample_accession
                       INNER JOIN
                         treatment tr ON es2tr.treatment_accession=tr.treatment_accession
                       WHERE 
@@ -224,12 +230,11 @@ getArrayResults <- function(conn, study_id, measurement_type) {
 
 getCountOfArrayResults <- function(conn, study_id) {
   sql_stmt <- paste("SELECT count(*)
-                      FROM experiment ex,
+                      FROM 
                     biosample bs,
-                    biosample_2_expsample be,
+                    expsample_2_biosample be,
                     expsample_public_repository er
-                    WHERE ex.study_accession in ('", study_id, "') AND
-                    be.experiment_accession=ex.experiment_accession AND
+                    WHERE bs.study_accession in ('", study_id, "') AND
                     bs.biosample_accession=be.biosample_accession AND
                     be.expsample_accession=er.expsample_accession AND
                     er.repository_name='GEO'", sep = "")
@@ -240,14 +245,12 @@ getCountOfArrayResults <- function(conn, study_id) {
   
   sql_stmt <- paste("SELECT count(*)
                       FROM 
-                        experiment ex,
                         biosample bs,
-                        biosample_2_expsample be,
+                        expsample_2_biosample be,
                         expsample_2_file_info es2fi, 
                         file_info fi                      
                       WHERE 
-                        ex.study_accession in ('", study_id, "') AND 
-                        be.experiment_accession=ex.experiment_accession AND
+                        bs.study_accession in ('", study_id, "') AND 
                         bs.biosample_accession=be.biosample_accession AND
                         be.expsample_accession=es2fi.expsample_accession AND
                         es2fi.data_format like \"%Gene_Expression%\" AND

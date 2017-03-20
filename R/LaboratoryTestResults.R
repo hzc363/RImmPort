@@ -43,18 +43,18 @@ getLaboratoryTestResults <- function(data_src, study_id) {
   
     
     sql_stmt <- paste("SELECT distinct
-                        lt.study_accession,
+                        bs.study_accession,
                         \"LB\" as domain,
                         bs.subject_accession,
                         cast(0 as UNSIGNED INTEGER) as seq,
                         lt.name_reported,
-                        lt.panel_name_reported,
+                        ltp.name_reported,
                         lt.result_value_reported,
                         lt.result_unit_reported,
                         bs.type,
                         bs.subtype,
                         pv.order_number,
-                        pv.visit_name,
+                        pv.name,
                         pv.min_start_day,
                         pv.max_start_day,
                         bs.study_time_collected,
@@ -62,12 +62,15 @@ getLaboratoryTestResults <- function(data_src, study_id) {
                         bs.study_time_t0_event,
                         bs.study_time_t0_event_specify,
                         bs.biosample_accession
-                      FROM  lab_test lt,
-                            biosample bs,                         
-                            planned_visit pv
-                      WHERE lt.study_accession in ('", study_id, "') AND
-                            lt.biosample_accession=bs.biosample_accession AND
-                            bs.planned_visit_accession=pv.planned_visit_accession
+                      FROM  
+                        lab_test lt
+                      INNER JOIN
+                        lab_test_panel ltp ON lt.lab_test_panel_accession=ltp.lab_test_panel_accession
+                      INNER JOIN
+                        biosample bs ON lt.biosample_accession=bs.biosample_accession
+                      INNER JOIN
+                        planned_visit pv ON bs.planned_visit_accession=pv.planned_visit_accession
+                      WHERE bs.study_accession in ('", study_id, "') 
                       ORDER BY bs.subject_accession", sep = "")
     
     if ((class(data_src)[1] == 'MySQLConnection') || 
@@ -155,7 +158,7 @@ getCountOfLaboratoryTestResults <- function(conn, study_id) {
     sql_stmt <- paste("SELECT count(*)
                       FROM  lab_test lt,
                             biosample bs
-                      WHERE lt.study_accession in ('", study_id, "') AND 
+                      WHERE bs.study_accession in ('", study_id, "') AND 
                             lt.biosample_accession=bs.biosample_accession", sep = "")
     
     count <- dbGetQuery(conn, statement = sql_stmt)

@@ -32,26 +32,26 @@ getDemographics <- function(data_src,study_id) {
   
   sql_stmt <- paste("
                                   SELECT distinct
-                                  a2.study_accession,
+                                  arm.study_accession,
                                   \"DM\" as domain,
-                                  s1.subject_accession,
-                                  s1.age_reported,
-                                  s1.age_unit,
-                                  s1.gender,
-                                  s1.race,
-                                  s1.ethnicity,
-                                  s1.species,
-                                  s1.strain,
-                                  s1.strain_characteristics,
-                                  a2.arm_accession,
-                                  a2.name as arm_name
-                                  FROM subject s1,
-                                  arm_2_subject a1,
-                                  arm_or_cohort a2
-                                  WHERE s1.subject_accession = a1.subject_accession
-                                  AND a1.arm_accession = a2.arm_accession
-                                  AND a2.study_accession in (\'", study_id,"\')
-                                  ORDER BY s1.subject_accession",sep="")
+                                  sub.subject_accession,
+                                  ((arm2sub.min_subject_age+arm2sub.max_subject_age)/2) as age,
+                                  arm2sub.age_unit,
+                                  sub.gender,
+                                  sub.race,
+                                  sub.ethnicity,
+                                  sub.species,
+                                  sub.strain,
+                                  sub.strain_characteristics,
+                                  arm.arm_accession,
+                                  arm.name as arm_name
+                                  FROM subject sub
+                                  INNER JOIN
+                                  arm_2_subject arm2sub ON sub.subject_accession = arm2sub.subject_accession
+                                  INNER JOIN
+                                  arm_or_cohort arm ON arm2sub.arm_accession = arm.arm_accession
+                                  WHERE arm.study_accession in (\'", study_id,"\')
+                                  ORDER BY sub.subject_accession",sep="")
   
   if ((class(data_src)[1] == 'MySQLConnection') || 
       (class(data_src)[1] == 'SQLiteConnection')) {
@@ -100,12 +100,12 @@ getDemographics <- function(data_src,study_id) {
 getCountOfDemographics <- function(conn,study_id) {  
   sql_stmt <- paste("
                     SELECT count(*)
-                    FROM subject s1,
-                    arm_2_subject a1,
-                    arm_or_cohort a2
-                    WHERE s1.subject_accession = a1.subject_accession
-                    AND a1.arm_accession = a2.arm_accession
-                    AND a2.study_accession in (\'", study_id,"\')", sep="")
+                      FROM subject sub
+                      INNER JOIN
+                      arm_2_subject arm2sub ON sub.subject_accession = arm2sub.subject_accession
+                      INNER JOIN
+                      arm_or_cohort arm ON arm2sub.arm_accession = arm.arm_accession
+                      WHERE arm.study_accession in (\'", study_id,"\')",sep="")
   
   count <- dbGetQuery(conn,statement=sql_stmt)
   

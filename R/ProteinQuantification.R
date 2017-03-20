@@ -18,7 +18,7 @@ globalVariables(c("subject_id", "result_id", "experiment_title", "assay_purpose"
                   "treatment_temperature_value", "treatment_temperature_unit",
                   "visit_name", "visit_min_start_day", "visit_max_start_day", "visit_order",
                   "elapsed_time_of_specimen_collection", "time_point_reference",
-                  "biosample_accession", "file_name", "concentration_value", "concentration_unit", 
+                  "biosample_accession", "experiment_sample_accession", "file_name", "concentration_value", "concentration_unit", 
                   "mfi", "mfi_coordinate", "QNAM", "QVAL", "ZAMFI", "ZAMFICRD", "ZASPECSB", "ZAREFIDP",
                   "VISITMIN", "VISITMAX",
                   "ZASPTRT", 

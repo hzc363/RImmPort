@@ -36,31 +36,34 @@ getVitalSigns <- function(data_src, study_id) {
     suppvs_cols <- c("STUDYID", "RDOMAIN", "USUBJID", "IDVAR", "IDVARVAL", "QNAM", "QLABEL", "QVAL")
   
     sql_stmt <- paste("SELECT distinct
-                        asm.study_accession,
+                        asmp.study_accession,
                         \"VS\" as domain,
-                        asm.subject_accession,
+                        asmc.subject_accession,
                         cast(0 as UNSIGNED INTEGER) as seq,
-                        asm.component_name_reported,
-                        asm.panel_name_reported,
-                        asm.result_value_reported,
-                        asm.result_unit_reported,
-                        asm.location_of_finding_reported,
-                        asm.time_of_day,
+                        asmc.name_reported,
+                        asmp.name_reported,
+                        asmc.result_value_reported,
+                        asmc.result_unit_reported,
+                        asmc.location_of_finding_reported,
+                        asmc.time_of_day,
                         pv.order_number,
-                        pv.visit_name,
-                        asm.study_day                    
-                      FROM  assessment asm, planned_visit pv
-                      WHERE (asm.study_accession in ('", study_id, "')) AND 
-                        (asm.assessment_type='Physical Exam') AND
-                        ((asm.component_name_reported='Heart Rate') OR 
-                         (asm.component_name_reported='Diastolic Blood Pressure') OR
-                         (asm.component_name_reported='Systolic Blood Pressure') OR
-                         (asm.component_name_reported='Height') OR
-                         (asm.component_name_reported='Weight') OR
-                         (asm.component_name_reported='Respiration Rate') OR
-                         (asm.component_name_reported='Temperature')) AND
-                        (asm.planned_visit_accession = pv.planned_visit_accession)
-                      ORDER BY asm.subject_accession", sep = "")
+                        pv.name,
+                        asmc.study_day                    
+                      FROM  assessment_component asmc
+                      INNER JOIN
+                      assessment_panel asmp ON asmc.assessment_panel_accession=asmp.assessment_panel_accession
+                      INNER JOIN
+                      planned_visit pv ON asmc.planned_visit_accession=pv.planned_visit_accession
+                      WHERE (asmp.study_accession in ('", study_id, "')) AND 
+                        (asmp.assessment_type='Physical Exam') AND
+                        ((asmc.name_reported='Heart Rate') OR 
+                         (asmc.name_reported='Diastolic Blood Pressure') OR
+                         (asmc.name_reported='Systolic Blood Pressure') OR
+                         (asmc.name_reported='Height') OR
+                         (asmc.name_reported='Weight') OR
+                         (asmc.name_reported='Respiration Rate') OR
+                         (asmc.name_reported='Temperature')) 
+                      ORDER BY asmc.subject_accession", sep = "")
     
     if ((class(data_src)[1] == 'MySQLConnection') || 
         (class(data_src)[1] == 'SQLiteConnection')) {
@@ -124,16 +127,18 @@ getVitalSigns <- function(data_src, study_id) {
 # }
 getCountOfVitalSigns <- function(conn, study_id) {
   sql_stmt <- paste("SELECT count(*)
-                      FROM  assessment asm
-                      WHERE (asm.study_accession in ('", study_id, "')) AND 
-                        (asm.assessment_type='Physical Exam') AND
-                        ((asm.component_name_reported='Heart Rate') OR 
-                        (asm.component_name_reported='Diastolic Blood Pressure') OR
-                        (asm.component_name_reported='Systolic Blood Pressure') OR
-                        (asm.component_name_reported='Height') OR
-                        (asm.component_name_reported='Weight') OR
-                        (asm.component_name_reported='Respiration Rate') OR
-                        (asm.component_name_reported='Temperature'))", sep = "")
+                      FROM  assessment_component asmc
+                      INNER JOIN
+                      assessment_panel asmp ON asmc.assessment_panel_accession=asmp.assessment_panel_accession
+                      WHERE asmp.study_accession in ('", study_id, "') AND 
+                        (asmp.assessment_type='Physical Exam') AND
+                        ((asmc.name_reported='Heart Rate') OR 
+                        (asmc.name_reported='Diastolic Blood Pressure') OR
+                        (asmc.name_reported='Systolic Blood Pressure') OR
+                        (asmc.name_reported='Height') OR
+                        (asmc.name_reported='Weight') OR
+                        (asmc.name_reported='Respiration Rate') OR
+                        (asmc.name_reported='Temperature'))", sep = "")
                     
     count <- dbGetQuery(conn, statement = sql_stmt)
     

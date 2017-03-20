@@ -40,7 +40,7 @@ getExposure <- function(data_src, study_id) {
                         sub.subject_accession,
                         cast(0 as UNSIGNED INTEGER) as seq,
                         sub.compound_name_reported,
-                        sub.merge_name_reported,
+                        sub.name_reported,
                         sub.dose,
                         sub.dose_reported,
                         sub.dose_units,
@@ -50,7 +50,7 @@ getExposure <- function(data_src, study_id) {
                         sub.end_time,
                         sub.start_day,  
                         sub.end_day
-                      FROM  substance_merge sub
+                      FROM  intervention sub
                       WHERE sub.study_accession in ('", study_id, "') AND 
                         sub.compound_role='Intervention'                    
                       ORDER BY sub.subject_accession", sep = "")
@@ -99,7 +99,7 @@ getExposure <- function(data_src, study_id) {
 # }
 getCountOfExposure <- function(conn, study_id) {
     sql_stmt <- paste("SELECT count(*)
-                       FROM  substance_merge sub
+                       FROM  intervention sub
                        WHERE sub.study_accession in ('", study_id, "') AND 
                          sub.compound_role='Intervention'", sep = "")
     

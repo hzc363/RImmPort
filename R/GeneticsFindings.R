@@ -19,7 +19,7 @@ globalVariables(c("subject_id", "result_id", "result_set_id", "experiment_title"
                   "treatment_temperature_value", "treatment_temperature_unit",
                   "visit_name", "visit_min_start_day", "visit_max_start_day", "visit_order", 
                   "elapsed_time_of_specimen_collection", "time_point_reference",
-                  "biosample_accession", "repository_id", 
+                  "biosample_accession", "experiment_sample_accession", "repository_id", 
                   "QNAM", "QVAL", "PFSPECSB", "PFREFIDP", "PFPOPAR", 
                   "VISITMIN", "VISITMAX",
                   "PFSPTRT", 

@@ -32,7 +32,7 @@ getAdverseEvents <- function(data_src, study_id) {
     cat("loading Adverse Events data....")
 
     ae_cols <- c("STUDYID", "DOMAIN", "USUBJID", "AESEQ", "AESPID", "AETERM", "AEMODIFY", "AEBODYSYS", "AELOC", "AESEV", 
-               "AESER", "AEACN", "AEACNOTH", "AEREL", "AERELNST", "AEOUT", "AESTDY", "AEENDY")
+                "AEACN", "AEACNOTH", "AEREL", "AERELNST", "AEOUT", "AESTDY", "AEENDY")
   
     sql_stmt <- paste("SELECT distinct ae.study_accession,
                         \"AE\" as domain,                    
@@ -44,7 +44,6 @@ getAdverseEvents <- function(data_src, study_id) {
                         ae.organ_or_body_system_reported,                    
                         ae.location_of_reaction_reported,                    
                         ae.severity_reported,                    
-                        ae.is_serious_event,                    
                         ae.study_treatment_action_taken,                    
                         ae.other_action_taken,                    
                         ae.relation_to_study_treatment,                    
@@ -122,7 +121,6 @@ getCountOfAdverseEvents <- function(conn, study_id) {
 ##'     AEBODYSYS \tab Body System or Organ Class \cr
 ##'     AELOC \tab Location of Event \cr
 ##'     AESEV \tab Severity/Intensity \cr
-##'     AESER \tab Serious Event \cr
 ##'     AEACN \tab Action Taken with Study Treatment \cr
 ##'     AEACNOTH \tab Other Action Taken \cr
 ##'     AEREL \tab Causality \cr

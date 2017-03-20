@@ -43,13 +43,13 @@ getProtocolDeviations <- function(data_src, study_id) {
                         \"DV\" as domain,
                         pd.subject_accession,
                         cast(0 as UNSIGNED INTEGER) as seq,
-                        pd.deviation_description,
+                        pd.description,
                         pd.is_adverse_event_related,
                         pd.reason_for_deviation,
                         pd.resolution_of_deviation,
                         pd.subject_continued_study,
-                        pd.deviation_study_start_day,
-                        pd.deviation_study_end_day
+                        pd.study_start_day,
+                        pd.study_end_day
                       FROM  protocol_deviation pd
                       WHERE pd.study_accession in ('", study_id, "')
                       ORDER BY pd.subject_accession", sep = "")

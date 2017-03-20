@@ -243,6 +243,30 @@ mysql_conn <- dbConnect(MySQL(), user="username", password="password",
 ```{r  eval=FALSE}
 setImmPortDataSource(mysql_conn)
 ```
+## Option 2: ImmPort SQLite database
+
+### Download zip files of ImmPort data, in Tab format. e.g.'SDY139' and 'SDY208'
+```{r  eval=FALSE}
+# get the directory where ImmPort sample data is stored in the directory structure of RImmPort package
+studies_dir <- system.file("extdata", "ImmPortStudies", package = "RImmPort")
+
+# set tab_dir to the folder where the zip files are located
+tab_dir <- file.path(studies_dir, "Tab")
+list.files(tab_dir)
+```
+
+### Build a local SQLite ImmPort database instance. 
+```{r  eval=FALSE}
+# set db_dir to the folder where the database file 'ImmPort.sqlite' should be stored
+db_dir <- file.path(studies_dir, "Db")
+```
+```{r   eval=FALSE}
+# build a new ImmPort SQLite database with the data in the downloaded zip files
+buildNewSqliteDb(tab_dir, db_dir) 
+```
+```{r  eval=FALSE}
+list.files(db_dir)
+```
 
 ### Set the SQLite database as ImmPort data source
 

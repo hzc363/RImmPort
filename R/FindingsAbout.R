@@ -31,32 +31,36 @@ globalVariables(c("FASEQ", "QNAM", "QVAL", "FATOD"))
 getFindingsAbout <- function(data_src, study_id) {
     cat("loading Findings About data....")
   
-    fa_cols <- c("STUDYID", "DOMAIN", "USUBJID", "FASEQ", "FATEST", "FAOBJ", "FACAT", 
+    fa_cols <- c("STUDYID", "DOMAIN", "USUBJID", "FASEQ", "FATEST", "FACAT", "FAOBJ",  
                 "FAORRES", "FAORRESU", "FALOC", "FATOD", "VISITNUM", "VISIT", "FADY")
   
     suppfa_cols <- c("STUDYID", "RDOMAIN", "USUBJID", "IDVAR", "IDVARVAL", "QNAM", "QLABEL", "QVAL")
   
   
     sql_stmt <- paste("SELECT distinct
-                        asm.study_accession,
-                        \"FA\" as domain,
-                        asm.subject_accession,
-                        cast(0 as UNSIGNED INTEGER) as seq,
-                        asm.component_name_reported,
-                        asm.organ_or_body_system_reported,
-                        asm.panel_name_reported,
-                        asm.result_value_reported,
-                        asm.result_unit_reported,
-                        asm.location_of_finding_reported,
-                        asm.time_of_day,
-                        pv.order_number,
-                        pv.visit_name,
-                      asm.study_day                    
-                      FROM  assessment asm, planned_visit pv
-                      WHERE (asm.study_accession in ('", study_id, "')) AND 
-                        (asm.assessment_type='Other') AND
-                        (asm.planned_visit_accession = pv.planned_visit_accession)
-                      ORDER BY asm.subject_accession", sep = "")
+                      asmp.study_accession,
+                      \"FA\" as domain,
+                      asmc.subject_accession,
+                      cast(0 as UNSIGNED INTEGER) as seq,
+                      asmc.name_reported,
+                      asmp.name_reported,
+                      asmc.organ_or_body_system_reported,
+                      asmc.result_value_reported,
+                      asmc.result_unit_reported,
+                      asmc.location_of_finding_reported,
+                      asmc.time_of_day,
+                      pv.order_number,
+                      pv.name,
+                      asmc.study_day                    
+                      FROM  assessment_component asmc
+                      INNER JOIN
+                      assessment_panel asmp ON asmc.assessment_panel_accession=asmp.assessment_panel_accession
+                      INNER JOIN
+                      planned_visit pv ON asmc.planned_visit_accession=pv.planned_visit_accession
+                      WHERE (asmp.study_accession in ('", study_id, "')) AND 
+                      (asmp.assessment_type='Other') 
+                      ORDER BY asmc.subject_accession", sep = "")
+
     if ((class(data_src)[1] == 'MySQLConnection') || 
         (class(data_src)[1] == 'SQLiteConnection')) {
       fa_df <- dbGetQuery(data_src, statement = sql_stmt)
@@ -87,7 +91,7 @@ getFindingsAbout <- function(data_src, study_id) {
         fa_df <- subset(fa_df, select = -c(FATOD))
       }
     } else {
-      l <- loadSerializedStudyData(data_src, study_id, "Exposure")
+      l <- loadSerializedStudyData(data_src, study_id, "Findings About")
       fa_df <- l[[1]]
       suppfa_df <- l[[2]]
     }
@@ -116,9 +120,11 @@ getFindingsAbout <- function(data_src, study_id) {
 # }
 getCountOfFindingsAbout <- function(conn, study_id) {
     sql_stmt <- paste("SELECT count(*)
-                      FROM  assessment asm
-                      WHERE asm.study_accession in ('", study_id, "') AND 
-                        asm.assessment_type='Other'", sep = "")
+                    FROM  assessment_component asmc
+                    INNER JOIN
+                      assessment_panel asmp ON asmc.assessment_panel_accession=asmp.assessment_panel_accession 
+                      WHERE (asmp.study_accession in ('", study_id, "')) AND 
+                      asmp.assessment_type='Other'", sep = "")
     
     count <- dbGetQuery(conn, statement = sql_stmt)
     

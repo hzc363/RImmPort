@@ -12,14 +12,14 @@ NULL
 # this hack is to satisfy CRAN (http://stackoverflow.com/questions/9439256/how-can-i-handle-r-cmd-check-no-visible-binding-for-global-variable-notes-when)
 globalVariables(c("subject_id", "experiment_title", "assay_purpose", "measurement_technique",
                   "entrez_gene_id", "gene_name", "gene_symbol",
-                  "threshold_cycles", "value_reported", "unit_reported", "specimen_type",
+                  "value_reported", "unit_reported", "specimen_type",
                   "specimen_subtype", "specimen_treatment", 
                   "treatment_amount_value", "treatment_amount_unit",
                   "treatment_duration_value", "treatment_duration_unit",
                   "treatment_temperature_value", "treatment_temperature_unit",
                   "visit_name", "visit_min_start_day", "visit_max_start_day", "visit_order",
                   "elapsed_time_of_specimen_collection", "time_point_reference",
-                  "biosample_accession", "ZCSPECSB", "ZCREFIDP",
+                  "biosample_accession", "experiment_sample_accession", "ZCSPECSB", "ZCREFIDP",
                   "VISITMIN", "VISITMAX",
                   "ZCSPTRT", 
                   "ZCTRTAMV", "ZCTRTAMU",
@@ -53,7 +53,7 @@ getNucleicAcidQuantification <- function(data_src, study_id, assay_type="ALL") {
   nq_cols <- c("STUDYID", "DOMAIN", "USUBJID", "ZCSEQ", 
                "ZCTEST", "ZCCAT", "ZCMETHOD", 
                "ZCENTRZD", "ZCGENNAM", "ZCGENSYM",
-               "ZCTHRESH", "ZCORRES", "ZCORRESU", 
+               "ZCORRES", "ZCORRESU", 
                "ZCSPEC", "ZCREFID", 
                "VISITNUM", "VISIT", "ZCELTM", "ZCTPTREF")
   
@@ -70,7 +70,7 @@ getNucleicAcidQuantification <- function(data_src, study_id, assay_type="ALL") {
 
     #   pcr_column_names <- c("study_id", "subject_id", "result_id",
     #                         "entrez_gene_id", "gene_name", "gene_symbol", 
-    #                         "threshold_cycles", "value_reported", "unit_reported",
+    #                         "value_reported", "unit_reported",
     #                         "experiment_title", "assay_purpose", "measurement_technique",
     #                         "biosample_accession", "specimen_type", "specimen_subtype",
     #                         "visit_name", "elapsed_time_of_specimen_collection", "time_point_reference",
@@ -81,7 +81,7 @@ getNucleicAcidQuantification <- function(data_src, study_id, assay_type="ALL") {
         pcr_df <- select(pcr_df, STUDYID = study_id, USUBJID = subject_id, ZCSEQ = sequence, ZCTEST = experiment_title, 
                          ZCCAT = assay_purpose, ZCMETHOD = measurement_technique, 
                          ZCENTRZD = entrez_gene_id, ZCGENNAM = gene_name, ZCGENSYM = gene_symbol,
-                         ZCTHRESH = threshold_cycles, ZCORRES = value_reported, ZCORRESU = unit_reported,
+                         ZCORRES = value_reported, ZCORRESU = unit_reported,
                          ZCSPEC = specimen_type, ZCSPECSB = specimen_subtype,
                          ZCSPTRT = specimen_treatment, 
                          ZCTRTAMV = treatment_amount_value, ZCTRTAMU = treatment_amount_unit,
@@ -191,11 +191,11 @@ getCountOfNucleicAcidQuantification <- function(data_src, study_id, assay_type="
 ##'     ZCTEST \tab Nucleic Acid Quantification Test Name \cr
 ##'     ZCCAT \tab Category for Nucleic Acid Quantification \cr
 ##'     ZCMETHOD \tab Measurement Technique \cr
-##'     ZCPOPDEF \tab Cell Population Definition \cr
-##'     ZCPOPNAM \tab Cell Population Name \cr
+##'     ZCENTRZD \tab Entrez Gene ID \cr
+##'     ZCGENNAM \tab Gene Name \cr
+##'     ZCGENSYM \tab Gene Symbol \cr
 ##'     ZCORRES \tab Result or Finding in Original Units \cr
 ##'     ZCORRESU \tab Original Units \cr
-##'     ZCBASPOP \tab Base Parent Population \cr
 ##'     ZCSPEC \tab Specimen Type \cr
 ##'     ZCREFID \tab Specimen Identifier \cr
 ##'     VISITNUM \tab Visit Number \cr

@@ -13,6 +13,8 @@ Trial Design class
 \describe{
 \item{\code{ta_l}}{Trial Arms data \code{\link{TA}} and supplemental Trial Arms data \code{\link{SUPP}}}
 
+\item{\code{tv_l}}{Trial Visits data \code{\link{TA}} and supplemental Trial Visits data \code{\link{SUPP}}}
+
 \item{\code{ti_l}}{Trial Inclusion Exclusion Criteria data \code{\link{TI}} and supplemental Trial Inclusion Exclusion Criteria data \code{\link{SUPP}}}
 
 \item{\code{ts_l}}{Trial Summary data \code{\link{TS}} and supplemental Trial Summary data \code{\link{SUPP}}}

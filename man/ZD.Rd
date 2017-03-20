@@ -14,11 +14,9 @@
     ZDTEST \tab Titer Assay Results Test Name \cr
     ZDCAT \tab Category for Titer Assay Results \cr
     ZDMETHOD \tab Measurement Technique \cr
-    ZDPOPDEF \tab Cell Population Definition \cr
-    ZDPOPNAM \tab Cell Population Name \cr
+    ZDSTRAIN \tab Virus Strain \cr
     ZDORRES \tab Result or Finding in Original Units \cr
     ZDORRESU \tab Original Units \cr
-    ZDBASPOP \tab Base Parent Population \cr
     ZDSPEC \tab Specimen Type \cr
     ZDREFID \tab Specimen Identifier \cr
     VISITNUM \tab Visit Number \cr

@@ -9,9 +9,9 @@ domain_names_codes <- c(
   c("Physical Examination", "PE"),
   c("Protocol Deviations", "DV"),
   c("Trial Arms", "TA"),
+  c("Trial Visits", "TV"),
   c("Trial Inclusion Exclusion Criteria", "TI"),
   c("Trial Summary", "TS"),
-  c("Subject Visits", "SV"),
   c("Substance Use", "SU"),
   c("Vital Signs", "VS"),
   c("Questionnaires", "QS"),
@@ -69,7 +69,6 @@ setImmPortDataSource <- function(data_src){
 ##' Special Purpose class
 ##' 
 ##' @field dm_l Demographics data \code{\link{DM}} and supplemental Demographics data \code{\link{SUPP}}
-##' @field sv_l Subject Visits data \code{\link{SV}} and supplemental Subject Visits data \code{\link{SUPP}}
 ##' @examples
 ##' library(DBI)
 ##' library(sqldf)
@@ -85,13 +84,11 @@ setImmPortDataSource <- function(data_src){
 ##' @exportClass SpecialPurpose
 SpecialPurpose <- setRefClass("SpecialPurpose", 
                               fields = list( 
-                                dm_l="list",
-                                sv_l="list" 
+                                dm_l="list"
                               ),
                               methods = list(
                                 getSpecialPurpose = function(data_src, study_id) {
                                   dm_l <<- getDemographics(data_src, study_id)
-                                  sv_l <<- getSubjectVisits(data_src, study_id)
                                 }
                               ))
 ##' Interventions class
@@ -210,6 +207,7 @@ Findings <- setRefClass("Findings",
 ##' Trial Design class
 ##' 
 ##' @field ta_l Trial Arms data \code{\link{TA}} and supplemental Trial Arms data \code{\link{SUPP}}
+##' @field tv_l Trial Visits data \code{\link{TA}} and supplemental Trial Visits data \code{\link{SUPP}}
 ##' @field ti_l Trial Inclusion Exclusion Criteria data \code{\link{TI}} and supplemental Trial Inclusion Exclusion Criteria data \code{\link{SUPP}}
 ##' @field ts_l Trial Summary data \code{\link{TS}} and supplemental Trial Summary data \code{\link{SUPP}}
 ##' @examples
@@ -226,12 +224,14 @@ Findings <- setRefClass("Findings",
 TrialDesign <- setRefClass("TrialDesign", 
                            fields = list(
                              ta_l="list",
+                             tv_l="list",
                              ti_l="list",
                              ts_l="list"
                            ),
                            methods = list(
                              getTrialDesign = function(data_src, study_id) {
                                ta_l <<- getTrialArms(data_src, study_id)
+                               tv_l <<- getTrialVisits(data_src, study_id)
                                ti_l <<- getTrialInclusionExclusionCriteria(data_src, study_id)
                                ts_l <<- getTrialSummary(data_src, study_id)
                              }
@@ -265,7 +265,6 @@ Study <- setRefClass("Study", fields = list(
     getTableOfContents = function() {
       contents_l <- list(
         r1=list(c1="Special Purpose", c2="Demographics", c3=""), 
-        r2=list(c1="Special Purpose", c2="Subject Visits", c3=""), 
         r4=list(c1="Interventions", c2="Concomitant Medications", c3=""), 
         r5=list(c1="Interventions", c2="Exposure", c3=""), 
         r7=list(c1="Interventions", c2="Substance Use", c3=""), 
@@ -286,7 +285,8 @@ Study <- setRefClass("Study", fields = list(
         r38=list(c1="Findings", c2="Titer Assay Results", c3=""), 
         r45=list(c1="Trial Design", c2="Trial Inclusion Exclusion Criteria", c3=""), 
         r46=list(c1="Trial Design", c2="Trial Arms", c3=""), 
-        r47=list(c1="Trial Design", c2="Trial Summary", c3=""))
+        r47=list(c1="Trial Design", c2="Trial Visits", c3=""), 
+        r48=list(c1="Trial Design", c2="Trial Summary", c3=""))
       
       contents_df <- ldply (contents_l, data.frame, stringsAsFactors = FALSE)
       
@@ -297,8 +297,6 @@ Study <- setRefClass("Study", fields = list(
       
       if (length(special_purpose$dm_l) > 0)
         contents_df[contents_df$Domain == "Demographics",3] <- "yes"
-      if (length(special_purpose$sv_l) > 0)
-        contents_df[contents_df$Domain == "Subject Visits",3] <- "yes"
       if (length(interventions$cm_l) > 0)
         contents_df[contents_df$Domain == "Concomitant Medications",3] <- "yes"
       if (length(interventions$ex_l) > 0)
@@ -339,6 +337,8 @@ Study <- setRefClass("Study", fields = list(
         contents_df[contents_df$Domain == "Trial Inclusion Exclusion Criteria",3] <- "yes"      
       if (length(trial_design$ta_l) > 0)
         contents_df[contents_df$Domain == "Trial Arms",3] <- "yes"
+      if (length(trial_design$tv_l) > 0)
+        contents_df[contents_df$Domain == "Trial Visits",3] <- "yes"
       if (length(trial_design$ts_l) > 0)
         contents_df[contents_df$Domain == "Trial Summary",3] <- "yes"
       
@@ -486,14 +486,14 @@ getDomainDataOfStudies <- function(domain, study_ids) {
           "Trial Arms" = {
             data_l <- getTrialArmsOfStudies(data_src, study_ids)
           },
+          "Trial Visits" = {
+            data_l <- getTrialVisitsOfStudies(data_src, study_ids)
+          },
           "Trial Inclusion Exclusion Criteria" = {
             data_l <- getTrialInclusionExclusionCriteriaOfStudies(data_src, study_ids)
           },
           "Trial Summary" = {
             data_l <- getTrialSummaryOfStudies(data_src, study_ids)
-          },
-          "Subject Visits" = {
-            data_l <- getSubjectVisitsOfStudies(data_src, study_ids)
           },
           "Substance Use" = {
             data_l <- getSubstanceUseOfStudies(data_src, study_ids)
@@ -561,6 +561,24 @@ getTrialArmsOfStudies <- function(data_src, study_ids) {
   data_l <- list()
   if (nrow(data_df) > 0)
     data_l <- list(ta_df=data_df, suppta_df=suppdata_df)
+  
+  data_l
+}
+
+getTrialVisitsOfStudies <- function(data_src, study_ids) {
+  data_df <- data.frame()
+  suppdata_df <- data.frame()
+  for (study_id in study_ids) {
+    data_l <- getTrialVisits(data_src, study_id)
+    if (length(data_l) > 0) {
+      data_df <- rbind(data_df, data_l[[1]])
+      suppdata_df <- rbind(suppdata_df, data_l[[2]])
+    }
+  }
+  
+  data_l <- list()
+  if (nrow(data_df) > 0)
+    data_l <- list(tv_df=data_df, supptv_df=suppdata_df)
   
   data_l
 }
@@ -745,23 +763,6 @@ getTrialSummaryOfStudies <- function(data_src, study_ids) {
   data_l
 }
 
-getSubjectVisitsOfStudies <- function(data_src, study_ids) {
-  data_df <- data.frame()
-  suppdata_df <- data.frame()
-  for (study_id in study_ids) {
-    data_l <- getSubjectVisits(data_src, study_id)
-    if (length(data_l) > 0) {
-      data_df <- rbind(data_df, data_l[[1]])
-      suppdata_df <- rbind(suppdata_df, data_l[[2]])
-    }
-  }
-  
-  data_l <- list()
-  if (nrow(data_df) > 0)
-    data_l <- list(sv_df=data_df, suppsv_df=suppdata_df)
-  
-  data_l
-}
 
 getSubstanceUseOfStudies <- function(data_src, study_ids) {
   data_df <- data.frame()
@@ -1073,6 +1074,9 @@ getStudiesWithSpecificDomainData <- function(domain, all_study_ids = c("ALL")) {
             "Trial Arms" = {
               study_ids <- getStudiesWithTrialArms(data_src)
             },
+            "Trial Visits" = {
+              study_ids <- getStudiesWithTrialVisits(data_src)
+            },
             "Concomitant Medications" = {
               study_ids <- getStudiesWithConcomitantMedications(data_src)
             },
@@ -1102,9 +1106,6 @@ getStudiesWithSpecificDomainData <- function(domain, all_study_ids = c("ALL")) {
             },
             "Trial Summary" = {
               study_ids <- getStudiesWithTrialSummary(data_src)
-            },
-            "Subject Visits" = {
-              study_ids <- getStudiesWithSubjectVisits(data_src)
             },
             "Substance Use" = {
               study_ids <- getStudiesWithSubstanceUse(data_src)
@@ -1159,6 +1160,18 @@ getStudiesWithTrialArms <- function(data_src) {
   study_ids = c()
   for (study_id in all_study_ids) {
     if (getCountOfTrialArms(data_src, study_id) > 0)
+      # add to list
+      study_ids = c(study_ids,study_id)
+  }
+  
+  study_ids
+}
+
+getStudiesWithTrialVisits <- function(data_src) {
+  all_study_ids <- getListOfStudies()
+  study_ids = c()
+  for (study_id in all_study_ids) {
+    if (getCountOfTrialVisits(data_src, study_id) > 0)
       # add to list
       study_ids = c(study_ids,study_id)
   }
@@ -1286,17 +1299,6 @@ getStudiesWithTrialSummary <- function(data_src) {
   study_ids
 }
 
-getStudiesWithSubjectVisits <- function(data_src) {
-  all_study_ids <- getListOfStudies()
-  study_ids = c()
-  for (study_id in all_study_ids) {
-    if (getCountOfSubjectVisits(data_src, study_id) > 0)
-      # add to list
-      study_ids = c(study_ids,study_id)
-  }
-  
-  study_ids
-}
 
 getStudiesWithSubstanceUse <- function(data_src) {
   all_study_ids <- getListOfStudies()

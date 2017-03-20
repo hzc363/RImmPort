@@ -17,7 +17,6 @@
     AEBODYSYS \tab Body System or Organ Class \cr
     AELOC \tab Location of Event \cr
     AESEV \tab Severity/Intensity \cr
-    AESER \tab Serious Event \cr
     AEACN \tab Action Taken with Study Treatment \cr
     AEACNOTH \tab Other Action Taken \cr
     AEREL \tab Causality \cr

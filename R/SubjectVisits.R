@@ -1,7 +1,7 @@
 #' Subject Visits Domain
 #' 
 #' @name Subject Visits Domain
-#' @description The Demographics data of an ImmPort study is reformated to the CDISC SDTM Subject Visits (SV) 
+#' @description Actual subject visits data of an ImmPort study is reformated to the CDISC SDTM Subject Visits (SV) 
 #' domain model, and is a list of 2 data frames containing 1) Subject Visits data \code{\link{SV}} 
 #' and 2) any supplemental Subject Visits data \code{\link{SUPP}}
 NULL

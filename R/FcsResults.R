@@ -43,14 +43,14 @@ getFcsResults <- function(conn,study_id, measurement_types) {
                       bs.study_accession,
                       bs.subject_accession,     
                       cast(0 as UNSIGNED INTEGER) as seq,
-                      ex.title,
+                      ex.name,
                       ex.purpose,
                       ex.measurement_technique,
-                      bs2es.expsample_accession,
+                      es2bs.expsample_accession,
                       bs.biosample_accession,
                       bs.type,
                       bs.subtype,
-                      pv.visit_name,
+                      pv.name,
                       pv.min_start_day,
                       pv.max_start_day,
                       pv.order_number,
@@ -64,13 +64,15 @@ getFcsResults <- function(conn,study_id, measurement_types) {
                     FROM  
                       biosample bs
                     INNER JOIN
-                      biosample_2_expsample bs2es ON bs.biosample_accession=bs2es.biosample_accession
+                      expsample_2_biosample es2bs ON bs.biosample_accession=es2bs.biosample_accession
+                    INNER JOIN
+                      expsample es ON es2bs.expsample_accession=es.expsample_accession
                     INNER JOIN
                       planned_visit pv ON bs.planned_visit_accession=pv.planned_visit_accession
                     INNER JOIN
-                      experiment ex ON bs2es.experiment_accession=ex.experiment_accession
+                      experiment ex ON es.experiment_accession=ex.experiment_accession
                     INNER JOIN
-                      expsample_2_file_info es2fi ON bs2es.expsample_accession=es2fi.expsample_accession
+                      expsample_2_file_info es2fi ON es2bs.expsample_accession=es2fi.expsample_accession
                     INNER JOIN
                       file_info fi ON es2fi.file_info_id=fi.file_info_id                    
                     WHERE 
@@ -101,14 +103,14 @@ getFcsResults <- function(conn,study_id, measurement_types) {
 
     sql_stmt <- paste("
                       SELECT distinct
-                        bs2es.expsample_accession,
+                        es2bs.expsample_accession,
                         fi.name
                       FROM  
                         biosample bs
                       INNER JOIN
-                        biosample_2_expsample bs2es ON bs.biosample_accession=bs2es.biosample_accession
+                        expsample_2_biosample es2bs ON bs.biosample_accession=es2bs.biosample_accession
                       INNER JOIN
-                        expsample_2_file_info es2fi ON bs2es.expsample_accession=es2fi.expsample_accession
+                        expsample_2_file_info es2fi ON es2bs.expsample_accession=es2fi.expsample_accession
                       INNER JOIN
                         file_info fi ON es2fi.file_info_id=fi.file_info_id                    
                       WHERE 
@@ -127,7 +129,7 @@ getFcsResults <- function(conn,study_id, measurement_types) {
     
     sql_stmt <- paste("
                       SELECT distinct
-                        bs2es.expsample_accession,
+                        es2bs.expsample_accession,
                         tr.name,
                         tr.amount_value,
                         tr.amount_unit,
@@ -138,9 +140,9 @@ getFcsResults <- function(conn,study_id, measurement_types) {
                       FROM  
                         biosample bs
                       INNER JOIN
-                        biosample_2_expsample bs2es ON bs.biosample_accession=bs2es.biosample_accession
+                        expsample_2_biosample es2bs ON bs.biosample_accession=es2bs.biosample_accession
                       INNER JOIN
-                        expsample_2_treatment es2tr ON bs2es.expsample_accession=es2tr.expsample_accession
+                        expsample_2_treatment es2tr ON es2bs.expsample_accession=es2tr.expsample_accession
                       INNER JOIN
                         treatment tr ON es2tr.treatment_accession=tr.treatment_accession
                       WHERE 
@@ -196,17 +198,19 @@ getCountOfFcsResults <- function(conn,study_id) {
   sql_stmt <- paste("
                     SELECT count(*)
                     FROM biosample bs,
+					          expsample es,
                     experiment ex,
-                    biosample_2_expsample bs2es,
+                    expsample_2_biosample es2bs,
                     expsample_2_file_info es2fi,
                     file_info fi                    
                     WHERE bs.study_accession in (\'", study_id,"\') AND 
-                    bs.biosample_accession=bs2es.biosample_accession AND
-                    bs2es.experiment_accession=ex.experiment_accession AND
-                    bs2es.expsample_accession=es2fi.expsample_accession AND 
+                    bs.biosample_accession=es2bs.biosample_accession AND
+                    es2bs.expsample_accession=es.expsample_accession AND 
+                    es.experiment_accession=ex.experiment_accession AND
+                    es2bs.expsample_accession=es2fi.expsample_accession AND 
                     es2fi.file_info_id=fi.file_info_id AND 
-                    fi.detail IN (\"Flow cytometry result in fcs format\") AND 
-                    fi.purpose IN (\"Flow cytometry result\")", sep="")
+                    fi.detail IN (\'Flow cytometry result in fcs format\', \'CyTOF result in fcs format\') AND 
+                    fi.purpose IN (\'Flow cytometry result\', \'CyTOF result\')", sep="")
   
   count <- dbGetQuery(conn,statement=sql_stmt)
   

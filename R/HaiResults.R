@@ -29,14 +29,14 @@ getHaiResults <- function(conn,study_id, measurement_type) {
                     hai.result_id,
                     hai.value_reported,
                     'HA' as unit_reported,
-                    ex.title,
+                    ex.name,
                     ex.purpose,
                     ex.measurement_technique,
                     hai.expsample_accession,
                     bs.biosample_accession, 
                     bs.type,
                     bs.subtype,
-                    pv.visit_name,
+                    pv.name,
                     pv.min_start_day,
                     pv.max_start_day,
                     pv.order_number,
@@ -44,7 +44,7 @@ getHaiResults <- function(conn,study_id, measurement_type) {
                     bs.study_time_collected_unit,
                     bs.study_time_t0_event,
                     bs.study_time_t0_event_specify,
-                    hai.virus_strain
+                    hai.virus_strain_reported
                     FROM  
                       hai_result hai
                     INNER JOIN

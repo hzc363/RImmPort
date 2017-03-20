@@ -41,20 +41,22 @@ getAssociatedPersonsMedicalHistory <- function(data_src, study_id) {
   suppapmh_cols <- c("STUDYID", "RDOMAIN", "USUBJID", "IDVAR", "IDVARVAL", "QNAM", "QLABEL", "QVAL")
   
   sql_stmt <- paste("SELECT distinct
-                      asm.study_accession,
+                      asmp.study_accession,
                       \"MH\" as domain,
                       cast(0 as UNSIGNED INTEGER) as apid,
                       cast(0 as UNSIGNED INTEGER) as seq,
-                      asm.subject_accession,
-                      asm.who_is_assessed,
-                      asm.component_name_reported,
-                      asm.panel_name_reported,
-                      asm.organ_or_body_system_reported,
-                      asm.study_day                    
-                    FROM  assessment asm
-                    WHERE asm.study_accession in ('", study_id, "') AND 
-                      asm.assessment_type='Family History'
-                    ORDER BY asm.subject_accession", sep = "")
+                      asmc.subject_accession,
+                      asmc.who_is_assessed,
+                      asmc.name_reported,
+                      asmc.name_reported,
+                      asmc.organ_or_body_system_reported,
+                      asmc.study_day                    
+                      FROM  assessment_component asmc
+                      INNER JOIN
+                      assessment_panel asmp ON asmc.assessment_panel_accession=asmp.assessment_panel_accession
+                      WHERE asmp.study_accession in ('", study_id, "') AND 
+                        asmp.assessment_type='Family History'
+                      ORDER BY asmc.subject_accession", sep = "")
   
   if ((class(data_src)[1] == 'MySQLConnection') || 
       (class(data_src)[1] == 'SQLiteConnection')) {
@@ -107,9 +109,11 @@ getAssociatedPersonsMedicalHistory <- function(data_src, study_id) {
 # }
 getCountOfAssociatedPersonsMedicalHistory <- function(conn, study_id) {
   sql_stmt <- paste("SELECT count(*)
-                    FROM  assessment asm
-                    WHERE asm.study_accession in ('", study_id, "') AND 
-                    asm.assessment_type='Family History'", sep = "")
+                    FROM  assessment_component asmc
+                    INNER JOIN
+                    assessment_panel asmp ON asmc.assessment_panel_accession=asmp.assessment_panel_accession
+                    WHERE asmp.study_accession in ('", study_id, "') AND 
+                    asmp.assessment_type='Family History'", sep = "")
   
   count <- dbGetQuery(conn, statement = sql_stmt)
   

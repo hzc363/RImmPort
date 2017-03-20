@@ -14,11 +14,11 @@
     ZCTEST \tab Nucleic Acid Quantification Test Name \cr
     ZCCAT \tab Category for Nucleic Acid Quantification \cr
     ZCMETHOD \tab Measurement Technique \cr
-    ZCPOPDEF \tab Cell Population Definition \cr
-    ZCPOPNAM \tab Cell Population Name \cr
+    ZCENTRZD \tab Entrez Gene ID \cr
+    ZCGENNAM \tab Gene Name \cr
+    ZCGENSYM \tab Gene Symbol \cr
     ZCORRES \tab Result or Finding in Original Units \cr
     ZCORRESU \tab Original Units \cr
-    ZCBASPOP \tab Base Parent Population \cr
     ZCSPEC \tab Specimen Type \cr
     ZCREFID \tab Specimen Identifier \cr
     VISITNUM \tab Visit Number \cr

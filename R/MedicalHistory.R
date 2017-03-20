@@ -40,21 +40,23 @@ getMedicalHistory <- function(data_src, study_id) {
     # Note these cols should go to suppmh: MHAGE, MHAGEU and MHTOD
       
     sql_stmt <- paste("SELECT distinct
-                        asm.study_accession,
+                        asmp.study_accession,
                         \"MH\" as domain,
-                        asm.subject_accession,
+                        asmc.subject_accession,
                         cast(0 as UNSIGNED INTEGER) as seq,
-                        asm.component_name_reported,
-                        asm.panel_name_reported,
-                        asm.organ_or_body_system_reported,
-                        asm.age_at_onset_reported,
-                        asm.age_at_onset_reported_unit,
-                        asm.time_of_day,
-                        asm.study_day                    
-                      FROM  assessment asm
-                      WHERE asm.study_accession in ('", study_id, "') AND 
-                        asm.assessment_type='Medical History'
-                      ORDER BY asm.subject_accession", sep = "")
+                        asmc.name_reported,
+                        asmp.name_reported,
+                        asmc.organ_or_body_system_reported,
+                        asmc.age_at_onset_reported,
+                        asmc.age_at_onset_unit_reported,
+                        asmc.time_of_day,
+                        asmc.study_day                    
+                      FROM  assessment_component asmc
+                      INNER JOIN
+                      assessment_panel asmp ON asmc.assessment_panel_accession=asmp.assessment_panel_accession
+                      WHERE asmp.study_accession in ('", study_id, "') AND 
+                        asmp.assessment_type='Medical History'
+                      ORDER BY asmc.subject_accession", sep = "")
     if ((class(data_src)[1] == 'MySQLConnection') || 
         (class(data_src)[1] == 'SQLiteConnection')) {
       mh_df <- dbGetQuery(data_src, statement = sql_stmt)
@@ -116,9 +118,11 @@ getMedicalHistory <- function(data_src, study_id) {
 # }
 getCountOfMedicalHistory <- function(conn, study_id) {
     sql_stmt <- paste("SELECT count(*)
-                      FROM  assessment asm
-                      WHERE asm.study_accession in ('", study_id, "') AND 
-                        asm.assessment_type='Medical History'", sep = "")
+                      FROM  assessment_component asmc
+                      INNER JOIN
+                      assessment_panel asmp ON asmc.assessment_panel_accession=asmp.assessment_panel_accession
+                      WHERE asmp.study_accession in ('", study_id, "') AND 
+                        asmp.assessment_type='Medical History'", sep = "")
     
     count <- dbGetQuery(conn, statement = sql_stmt)
     

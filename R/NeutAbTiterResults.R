@@ -28,15 +28,15 @@ getNeutAbTiterResults <- function(conn,study_id, measurement_type) {
                     nat.subject_accession,
                     nat.result_id,
                     nat.value_reported,
-                    'Neut Ab' as unit_reported,
-                    ex.title,
+                    nat.unit_reported,
+                    ex.name,
                     ex.purpose,
                     ex.measurement_technique,
                     nat.expsample_accession,
                     bs.biosample_accession, 
                     bs.type,
                     bs.subtype,
-                    pv.visit_name,
+                    pv.name,
                     pv.min_start_day,
                     pv.max_start_day,
                     pv.order_number,
@@ -44,7 +44,7 @@ getNeutAbTiterResults <- function(conn,study_id, measurement_type) {
                     bs.study_time_collected_unit,
                     bs.study_time_t0_event,
                     bs.study_time_t0_event_specify,
-                    nat.virus_strain
+                    nat.virus_strain_reported
                     FROM  
                       neut_ab_titer_result nat
                     INNER JOIN
