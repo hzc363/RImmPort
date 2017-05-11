@@ -44,7 +44,7 @@ getFcsResults <- function(conn,study_id, measurement_types) {
                       bs.subject_accession,     
                       cast(0 as UNSIGNED INTEGER) as seq,
                       ex.name,
-                      ex.purpose,
+                      'Cellular Quantification' as purpose,                      
                       ex.measurement_technique,
                       es2bs.expsample_accession,
                       bs.biosample_accession,
@@ -77,7 +77,7 @@ getFcsResults <- function(conn,study_id, measurement_types) {
                       file_info fi ON es2fi.file_info_id=fi.file_info_id                    
                     WHERE 
                       bs.study_accession in (\'", study_id,"\') AND
-                      fi.detail IN (\'Flow cytometry result in fcs format\', \'CyTOF result in fcs format\') AND 
+                      (fi.detail LIKE \'%Flow cytometry result%\' OR fi.detail LIKE \'%CyTOF result%\') AND 
                       fi.purpose IN (\'Flow cytometry result\', \'CyTOF result\')  
                     ORDER BY bs.subject_accession",sep="")
 
@@ -209,7 +209,7 @@ getCountOfFcsResults <- function(conn,study_id) {
                     es.experiment_accession=ex.experiment_accession AND
                     es2bs.expsample_accession=es2fi.expsample_accession AND 
                     es2fi.file_info_id=fi.file_info_id AND 
-                    fi.detail IN (\'Flow cytometry result in fcs format\', \'CyTOF result in fcs format\') AND 
+                    (fi.detail LIKE \'%Flow cytometry result%\' OR fi.detail LIKE \'%CyTOF result%\') AND 
                     fi.purpose IN (\'Flow cytometry result\', \'CyTOF result\')", sep="")
   
   count <- dbGetQuery(conn,statement=sql_stmt)

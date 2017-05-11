@@ -33,7 +33,7 @@ getHlaTypingResults <- function(conn,study_id, measurement_type) {
                     hla.locus_name, 
                     hla.ancestral_population, 
                     ex.name,
-                    ex.purpose,
+                    'Genetics Findings' as purpose,
                     ex.measurement_technique,
                     hla.expsample_accession,
                     bs.biosample_accession, 

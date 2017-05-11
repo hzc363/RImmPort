@@ -67,7 +67,7 @@ getTrialSummary <- function(data_src,study_id) {
                     st.age_unit,
                     st.gender_included,
                     st.sponsoring_organization,
-                    st.final_public_release_date,
+                    st.latest_data_release_date,
                     st.type,
                     st.clinical_trial,
                     \"\"                 

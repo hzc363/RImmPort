@@ -38,7 +38,7 @@ getElisaResults <- function(conn,study_id, measurement_types) {
                       els.value_reported, 
                       els.unit_reported, 
                       ex.name,
-                      ex.purpose,
+                      'Protein Quantification' as purpose,
                       ex.measurement_technique,
                       els.expsample_accession,
                       bs.biosample_accession,
@@ -61,8 +61,7 @@ getElisaResults <- function(conn,study_id, measurement_types) {
 						          biosample bs ON els.biosample_accession=bs.biosample_accession
                     INNER JOIN
                       planned_visit pv ON bs.planned_visit_accession=pv.planned_visit_accession
-                    WHERE els.study_accession in (\'", study_id,"\') AND
-                          ex.purpose != 'Neutralizing_Antibody_Titer'
+                    WHERE els.study_accession in (\'", study_id,"\') 
                     ORDER BY els.subject_accession",sep="")
 
   elisa_df <- dbGetQuery(conn,statement=sql_stmt)
@@ -139,8 +138,7 @@ getCountOfElisaResults <- function(conn,study_id) {
                       experiment ex ON els.experiment_accession=ex.experiment_accession
                     INNER JOIN
                       biosample bs ON els.biosample_accession=bs.biosample_accession
-                    WHERE els.study_accession in (\'", study_id,"\') AND
-                          ex.purpose != 'Neutralizing_Antibody_Titer'", sep="")
+                    WHERE els.study_accession in (\'", study_id,"\')", sep="")
   
   count <- dbGetQuery(conn,statement=sql_stmt)
   

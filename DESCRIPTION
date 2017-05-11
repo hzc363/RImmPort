@@ -6,12 +6,23 @@ Author: Ravi Shankar <rshankar@stanford.edu>
 Maintainer: Ravi Shankar <rshankar@stanford.edu>
 URL: http://bioconductor.org/packages/RImmPort/
 Description: The RImmPort package simplifies access to ImmPort data for
-        analysis in the R environment. It provides a standards-based
-        interface to the ImmPort study data that is in a proprietary
-        format.
+    analysis in the R environment. It provides a standards-based
+    interface to the ImmPort study data that is in a proprietary
+    format.
 License: GPL-3
-Imports: plyr, dplyr, DBI, data.table, reshape2, methods, sqldf, tools, utils, RSQLite
-Suggests: knitr
+Imports:
+    plyr,
+    dplyr,
+    DBI,
+    data.table,
+    reshape2,
+    methods,
+    sqldf,
+    tools,
+    utils,
+    RSQLite
+Suggests:
+    knitr
 biocViews: BiomedicalInformatics, DataImport, DataRepresentation
 VignetteBuilder: knitr
 RoxygenNote: 5.0.1

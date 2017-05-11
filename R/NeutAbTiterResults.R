@@ -30,7 +30,7 @@ getNeutAbTiterResults <- function(conn,study_id, measurement_type) {
                     nat.value_reported,
                     nat.unit_reported,
                     ex.name,
-                    ex.purpose,
+                    'Titer Assay Results' as purpose,
                     ex.measurement_technique,
                     nat.expsample_accession,
                     bs.biosample_accession, 

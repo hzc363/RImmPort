@@ -40,7 +40,7 @@ getMbaaResults <- function(conn,study_id, measurement_types) {
                       mbaa.mfi, 
                       mbaa.mfi_coordinate, 
                       ex.name,
-                      ex.purpose,
+                      'Protein Quantification' as purpose,
                       ex.measurement_technique,
                       mbaa.source_accession,
                       bs.biosample_accession,

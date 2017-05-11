@@ -32,7 +32,7 @@ getPcrResults <- function(conn,study_id, measurement_type) {
                     pcr.value_reported, 
                     pcr.unit_reported, 
                     ex.name,
-                    ex.purpose,
+                    'Nucleic Acid Quantification' as purpose,
                     ex.measurement_technique,
                     pcr.expsample_accession,
                     bs.biosample_accession, 

@@ -30,7 +30,7 @@ getHaiResults <- function(conn,study_id, measurement_type) {
                     hai.value_reported,
                     'HA' as unit_reported,
                     ex.name,
-                    ex.purpose,
+                    'Titer Assay Results' as purpose,
                     ex.measurement_technique,
                     hai.expsample_accession,
                     bs.biosample_accession, 

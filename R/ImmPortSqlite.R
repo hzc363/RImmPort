@@ -75,12 +75,9 @@ db_table_stmts <- c(
   `clinical_trial` VARCHAR(1) NOT NULL DEFAULT 'N' ,
   `condition_studied` VARCHAR(1000) NULL DEFAULT NULL ,
   `dcl_id` INT(11) NOT NULL DEFAULT '0' ,
-  `delete_study` VARCHAR(1) NULL DEFAULT 'N' ,
   `description` LONGTEXT NULL DEFAULT NULL ,
   `doi` VARCHAR(250) NULL DEFAULT NULL ,
-  `download_page_available` VARCHAR(1) NULL DEFAULT 'N' ,
   `endpoints` MEDIUMTEXT NULL DEFAULT NULL ,
-  `final_public_release_date` DATE NULL DEFAULT NULL ,
   `gender_included` VARCHAR(50) NULL DEFAULT NULL ,
   `hypothesis` VARCHAR(4000) NULL DEFAULT NULL ,
   `initial_data_release_date` DATE NULL DEFAULT NULL ,
@@ -92,12 +89,10 @@ db_table_stmts <- c(
   `minimum_age` VARCHAR(40) NULL DEFAULT NULL ,
   `objectives` MEDIUMTEXT NULL DEFAULT NULL ,
   `official_title` VARCHAR(500) NULL DEFAULT NULL ,
-  `planned_public_release_date` DATE NULL DEFAULT NULL ,
-  `shared_study` VARCHAR(1) NOT NULL DEFAULT 'N' ,
   `sponsoring_organization` VARCHAR(250) NULL DEFAULT NULL ,
   `target_enrollment` INT(11) NULL DEFAULT NULL ,
   `type` VARCHAR(50) NOT NULL ,
-  `workspace_id` INT(11) NULL DEFAULT NULL ,
+  `workspace_id` INT(11) NOT NULL ,
   PRIMARY KEY (`study_accession`) ,
   CONSTRAINT `fk_study_1`
   FOREIGN KEY (`workspace_id` )
@@ -240,11 +235,6 @@ db_table_stmts <- c(
   CONSTRAINT `fk_assessment_2`
   FOREIGN KEY (`workspace_id` )
   REFERENCES `workspace` (`workspace_id` ))",
-  "CREATE  TABLE IF NOT EXISTS `lk_data_format` (
-  `name` VARCHAR(100) NOT NULL ,
-  `description` VARCHAR(1000) NULL DEFAULT NULL ,
-  `link` VARCHAR(2000) NULL DEFAULT NULL ,
-  PRIMARY KEY (`name`) )",
   "CREATE  TABLE IF NOT EXISTS `lk_expsample_result_schema` (
   `name` VARCHAR(50) NOT NULL ,
   `description` VARCHAR(1000) NULL DEFAULT NULL ,
@@ -253,7 +243,6 @@ db_table_stmts <- c(
   "CREATE  TABLE IF NOT EXISTS `assessment_2_file_info` (
   `assessment_panel_accession` VARCHAR(15) NOT NULL ,
   `file_info_id` INT(11) NOT NULL ,
-  `data_format` VARCHAR(100) NOT NULL ,
   `result_schema` VARCHAR(50) NOT NULL ,
   PRIMARY KEY (`assessment_panel_accession`, `file_info_id`) ,
   CONSTRAINT `fk_assessment_2_file_info_1`
@@ -262,9 +251,6 @@ db_table_stmts <- c(
   CONSTRAINT `fk_assessment_2_file_info_2`
   FOREIGN KEY (`assessment_panel_accession` )
   REFERENCES `assessment_panel` (`assessment_panel_accession` ),
-  CONSTRAINT `fk_assessment_2_file_info_3`
-  FOREIGN KEY (`data_format` )
-  REFERENCES `lk_data_format` (`name` ),
   CONSTRAINT `fk_assessment_2_file_info_4`
   FOREIGN KEY (`result_schema` )
   REFERENCES `lk_expsample_result_schema` (`name` ))",
@@ -536,16 +522,12 @@ db_table_stmts <- c(
   `description` VARCHAR(4000) NULL DEFAULT NULL ,
   `measurement_technique` VARCHAR(50) NOT NULL ,
   `name` VARCHAR(500) NULL DEFAULT NULL ,
-  `purpose` VARCHAR(50) NULL DEFAULT NULL ,
   `study_accession` VARCHAR(15) NULL DEFAULT NULL ,
   `workspace_id` INT(11) NULL DEFAULT NULL ,
   PRIMARY KEY (`experiment_accession`) ,
   CONSTRAINT `fk_experiment_1`
   FOREIGN KEY (`workspace_id` )
   REFERENCES `workspace` (`workspace_id` ),
-  CONSTRAINT `fk_experiment_2`
-  FOREIGN KEY (`purpose` )
-  REFERENCES `lk_experiment_purpose` (`name` ),
   CONSTRAINT `fk_experiment_3`
   FOREIGN KEY (`measurement_technique` )
   REFERENCES `lk_exp_measurement_tech` (`name` ),
@@ -577,7 +559,6 @@ db_table_stmts <- c(
   "CREATE  TABLE IF NOT EXISTS `control_sample_2_file_info` (
   `control_sample_accession` VARCHAR(15) NOT NULL ,
   `file_info_id` INT(11) NOT NULL ,
-  `data_format` VARCHAR(100) NOT NULL ,
   `result_schema` VARCHAR(50) NOT NULL ,
   PRIMARY KEY (`control_sample_accession`, `file_info_id`) ,
   CONSTRAINT `fk_control_sample_2_file_info_1`
@@ -586,9 +567,6 @@ db_table_stmts <- c(
   CONSTRAINT `fk_control_sample_2_file_info_2`
   FOREIGN KEY (`file_info_id` )
   REFERENCES `file_info` (`file_info_id` ),
-  CONSTRAINT `fk_control_sample_2_file_info_3`
-  FOREIGN KEY (`data_format` )
-  REFERENCES `lk_data_format` (`name` ),
   CONSTRAINT `fk_control_sample_2_file_info_4`
   FOREIGN KEY (`result_schema` )
   REFERENCES `lk_expsample_result_schema` (`name` ))",
@@ -733,7 +711,6 @@ db_table_stmts <- c(
   "CREATE  TABLE IF NOT EXISTS `expsample_2_file_info` (
   `expsample_accession` VARCHAR(15) NOT NULL ,
   `file_info_id` INT(11) NOT NULL ,
-  `data_format` VARCHAR(100) NOT NULL ,
   `result_schema` VARCHAR(50) NOT NULL ,
   PRIMARY KEY (`expsample_accession`, `file_info_id`) ,
   CONSTRAINT `fk_expsample_2_file_info_1`
@@ -742,9 +719,6 @@ db_table_stmts <- c(
   CONSTRAINT `fk_expsample_2_file_info_2`
   FOREIGN KEY (`file_info_id` )
   REFERENCES `file_info` (`file_info_id` ),
-  CONSTRAINT `fk_expsample_2_file_info_3`
-  FOREIGN KEY (`data_format` )
-  REFERENCES `lk_data_format` (`name` ),
   CONSTRAINT `fk_expsample_2_file_info_4`
   FOREIGN KEY (`result_schema` )
   REFERENCES `lk_expsample_result_schema` (`name` ))",
@@ -1528,7 +1502,6 @@ db_table_stmts <- c(
   "CREATE  TABLE IF NOT EXISTS `standard_curve_2_file_info` (
   `standard_curve_accession` VARCHAR(15) NOT NULL ,
   `file_info_id` INT(11) NOT NULL ,
-  `data_format` VARCHAR(100) NOT NULL ,
   `result_schema` VARCHAR(50) NOT NULL ,
   PRIMARY KEY (`standard_curve_accession`, `file_info_id`) ,
   CONSTRAINT `fk_standard_curve_2_file_info_1`
@@ -1537,9 +1510,6 @@ db_table_stmts <- c(
   CONSTRAINT `fk_standard_curve_2_file_info_2`
   FOREIGN KEY (`file_info_id` )
   REFERENCES `file_info` (`file_info_id` ),
-  CONSTRAINT `fk_standard_curve_2_file_info_3`
-  FOREIGN KEY (`data_format` )
-  REFERENCES `lk_data_format` (`name` ),
   CONSTRAINT `fk_standard_curve_2_file_info_4`
   FOREIGN KEY (`result_schema` )
   REFERENCES `lk_expsample_result_schema` (`name` ))",
@@ -1725,7 +1695,6 @@ db_index_stmts <- c(
   "CREATE INDEX `idx_assessment_panel_study` ON `assessment_panel` (`study_accession` ASC)",
   "CREATE INDEX `idx_assessment_panel_workspace` ON `assessment_panel` (`workspace_id` ASC)",
   "CREATE INDEX `idx_assessment_2_file_info` ON `assessment_2_file_info` (`file_info_id` ASC, `assessment_panel_accession` ASC)",
-  "CREATE INDEX `fk_assessment_2_file_info_3` ON `assessment_2_file_info` (`data_format` ASC)",
   "CREATE INDEX `fk_assessment_2_file_info_4` ON `assessment_2_file_info` (`result_schema` ASC)",
   "CREATE INDEX `idx_reference_range_study` ON `reference_range` (`study_accession` ASC)",
   "CREATE INDEX `idx_reference_range_workspace` ON `reference_range` (`workspace_id` ASC)",
@@ -1760,13 +1729,11 @@ db_index_stmts <- c(
   "CREATE INDEX `idx_contract_grant_2_study_study` ON `contract_grant_2_study` (`study_accession` ASC, `contract_grant_id` ASC)",
   "CREATE INDEX `idx_experiment_study` ON `experiment` (`study_accession` ASC)",
   "CREATE INDEX `idx_experiment_workspace` ON `experiment` (`workspace_id` ASC)",
-  "CREATE INDEX `fk_experiment_2` ON `experiment` (`purpose` ASC)",
   "CREATE INDEX `fk_experiment_3` ON `experiment` (`measurement_technique` ASC)",
   "CREATE INDEX `idx_control_sample_workspace` ON `control_sample` (`workspace_id` ASC)",
   "CREATE INDEX `fk_control_sample_2` ON `control_sample` (`experiment_accession` ASC)",
   "CREATE INDEX `fk_control_sample_3` ON `control_sample` (`result_schema` ASC)",
   "CREATE INDEX `idx_control_sample_2_file_info` ON `control_sample_2_file_info` (`file_info_id` ASC, `control_sample_accession` ASC)",
-  "CREATE INDEX `fk_control_sample_2_file_info_3` ON `control_sample_2_file_info` (`data_format` ASC)",
   "CREATE INDEX `fk_control_sample_2_file_info_4` ON `control_sample_2_file_info` (`result_schema` ASC)",
   "CREATE INDEX `idx_expsample_experiment` ON `expsample` (`experiment_accession` ASC)",
   "CREATE INDEX `idx_expsample_workspace` ON `expsample` (`workspace_id` ASC)",
@@ -1791,7 +1758,6 @@ db_index_stmts <- c(
   "CREATE INDEX `idx_expsample_2_biosample` ON `expsample_2_biosample` (`biosample_accession` ASC, `expsample_accession` ASC)",
   "CREATE INDEX `idx_expsample_2_file_info` ON `expsample_2_file_info` (`file_info_id` ASC, `expsample_accession` ASC)",
   "CREATE INDEX `idx_expsample_2_file_info_id` ON `expsample_2_file_info` (`file_info_id` ASC)",
-  "CREATE INDEX `fk_expsample_2_file_info_3` ON `expsample_2_file_info` (`data_format` ASC)",
   "CREATE INDEX `fk_expsample_2_file_info_4` ON `expsample_2_file_info` (`result_schema` ASC)",
   "CREATE INDEX `idx_reagent_workspace` ON `reagent` (`workspace_id` ASC)",
   "CREATE INDEX `fk_reagent_2` ON `reagent` (`type` ASC)",
@@ -1890,7 +1856,6 @@ db_index_stmts <- c(
   "CREATE INDEX `fk_standard_curve_2` ON `standard_curve` (`experiment_accession` ASC)",
   "CREATE INDEX `fk_standard_curve_3` ON `standard_curve` (`result_schema` ASC)",
   "CREATE INDEX `fk_standard_curve_2_file_info_2` ON `standard_curve_2_file_info` (`file_info_id` ASC)",
-  "CREATE INDEX `fk_standard_curve_2_file_info_3` ON `standard_curve_2_file_info` (`data_format` ASC)",
   "CREATE INDEX `fk_standard_curve_2_file_info_4` ON `standard_curve_2_file_info` (`result_schema` ASC)",
   "CREATE INDEX `fk_study_2_panel_2` ON `study_2_panel` (`panel_name` ASC)",
   "CREATE INDEX `fk_study_2_protocol_2` ON `study_2_protocol` (`protocol_accession` ASC)",
@@ -1999,9 +1964,9 @@ buildNewSqliteDb <- function(data_dir, db_dir) {
       #cat("tb_col_names = ", tolower(tb_col_names), "\n")
       #cat("df_col_names = ", tolower(colnames(df)), "\n")
       
-      # if (all(tolower(tb_col_names) != tolower(colnames(df)))) {
-      #   cat("column mismatch in ", fname, " file \n")
-      # }
+      if (all(tolower(tb_col_names) != tolower(colnames(df)))) {
+         cat("column mismatch in ", fname, " file \n")
+      }
       if (length(tb_col_names) != length(colnames(df))) {
         cat("length of tb_col_names = ", length(tb_col_names), "\n")
         cat("length of df_col_names = ", length(colnames(df)), "\n")

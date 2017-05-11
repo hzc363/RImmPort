@@ -28,7 +28,7 @@ getArrayResults <- function(conn, study_id, measurement_type) {
                     cast(0 as UNSIGNED INTEGER) as sequence,
                     fi.name as dataset_id,
                     ex.name,
-                    ex.purpose,
+                    'Genetics Findings' as purpose,
                     ex.measurement_technique,
                     es2bs.expsample_accession,
                     bs.biosample_accession, 
@@ -58,8 +58,8 @@ getArrayResults <- function(conn, study_id, measurement_type) {
                     file_info fi ON es2fi.file_info_id=fi.file_info_id                    
                     WHERE 
                     bs.study_accession in (\'", study_id,"\') AND
-                    es2fi.data_format like \"%Gene_Expression%\" AND
                     es2fi.file_info_id = fi.file_info_id AND
+                    fi.purpose like \"%Gene_Expression%\" AND
                     LOWER(fi.name) like \"%.cel%\"
                     ORDER BY bs.subject_accession",sep="")
   
@@ -73,7 +73,7 @@ getArrayResults <- function(conn, study_id, measurement_type) {
                          cast(0 as UNSIGNED INTEGER) as sequence,
                          e2r.repository_accession as dataset_id,
                          ex.name,
-                         ex.purpose,
+                         'Genetics Findings' as purpose,
                          ex.measurement_technique,
                          es2bs.expsample_accession,
                          bs.biosample_accession, 
@@ -114,7 +114,7 @@ getArrayResults <- function(conn, study_id, measurement_type) {
                         cast(0 as UNSIGNED INTEGER) as sequence,
                         fi.name as dataset_id,
                         ex.name,
-                        ex.purpose,
+                        'Genetics Findings' as purpose,
                         ex.measurement_technique,
                         es2bs.expsample_accession,
                         bs.biosample_accession, 
@@ -144,8 +144,8 @@ getArrayResults <- function(conn, study_id, measurement_type) {
                         file_info fi ON es2fi.file_info_id=fi.file_info_id                    
                         WHERE 
                         bs.study_accession in (\'", study_id,"\') AND
-                        es2fi.data_format like \"%Gene_Expression%\" AND
-                        es2fi.file_info_id = fi.file_info_id 
+                        es2fi.file_info_id = fi.file_info_id AND
+                        fi.purpose like \"%Gene_Expression%\" 
                         ORDER BY bs.subject_accession",sep="")
       
       
