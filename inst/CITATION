@@ -1,0 +1,13 @@
+citHeader("RImmPort citation ")
+citEntry(entry="article",
+  author = "Shankar, Ravi D. and Bhattacharya, Sanchita and Jujjavarapu, Chethan and Andorf, Sandra and Wiser, Jeffery A. and Butte, Atul J.",
+  title = "RImmPort: an R/Bioconductor package that enables ready-for-analysis immunology research data",
+  journal = "Bioinformatics",
+  year = 2017,
+  volume = 33,
+  pages = "1101-1103",
+  textVersion=
+    paste("Shankar, Ravi D. and Bhattacharya, Sanchita and Jujjavarapu, Chethan and Andorf, Sandra and Wiser, Jeffery A. and Butte, Atul J.",
+          "RImmPort: an R/Bioconductor package that enables ready-for-analysis immunology research data.", 
+          "Bioinformatics, 2017, 33, 1101-1103",sep="\n")
+)
