@@ -78,7 +78,7 @@ getFcsResults <- function(conn,study_id, measurement_types) {
                     WHERE 
                       bs.study_accession in (\'", study_id,"\') AND
                       (fi.detail LIKE \'%Flow cytometry result%\' OR fi.detail LIKE \'%CyTOF result%\') AND 
-                      fi.purpose IN (\'Flow cytometry result\', \'CyTOF result\')  
+                      fi.detail IN (\'Flow cytometry result\', \'CyTOF result\')  
                     ORDER BY bs.subject_accession",sep="")
 
   fcs_df <- dbGetQuery(conn,statement=sql_stmt)
@@ -115,7 +115,7 @@ getFcsResults <- function(conn,study_id, measurement_types) {
                         file_info fi ON es2fi.file_info_id=fi.file_info_id                    
                       WHERE 
                         bs.study_accession in (\'", study_id,"\') AND
-                        fi.purpose IN (\'Flow cytometry compensation or control\')  
+                        fi.detail IN (\'Flow cytometry compensation or control\')  
                       ORDER BY bs.subject_accession",sep="")
     
     fcf_df <- dbGetQuery(conn,statement=sql_stmt)
@@ -210,7 +210,7 @@ getCountOfFcsResults <- function(conn,study_id) {
                     es2bs.expsample_accession=es2fi.expsample_accession AND 
                     es2fi.file_info_id=fi.file_info_id AND 
                     (fi.detail LIKE \'%Flow cytometry result%\' OR fi.detail LIKE \'%CyTOF result%\') AND 
-                    fi.purpose IN (\'Flow cytometry result\', \'CyTOF result\')", sep="")
+                    fi.detail IN (\'Flow cytometry result\', \'CyTOF result\')", sep="")
   
   count <- dbGetQuery(conn,statement=sql_stmt)
   

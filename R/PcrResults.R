@@ -7,7 +7,8 @@ getPcrResults <- function(conn,study_id, measurement_type) {
   cat("loading PCR Results data....")
 
   pcr_cols <- c("study_id", "subject_id", "sequence",
-                "entrez_gene_id", "gene_name", "gene_symbol", 
+                "entrez_gene_id", "gene_name", "gene_symbol_preferred", 
+                "gene_symbol_reported",
                 "value_reported", "unit_reported",
                 "experiment_title", "assay_purpose", "measurement_technique",
                 "experiment_sample_accession", "biosample_accession", "specimen_type", "specimen_subtype",
@@ -28,7 +29,8 @@ getPcrResults <- function(conn,study_id, measurement_type) {
                     pcr.result_id,
                     pcr.gene_id, 
                     pcr.gene_name, 
-                    pcr.gene_symbol, 
+                    pcr.gene_symbol_preferred, 
+                    pcr.gene_symbol_reported, 
                     pcr.value_reported, 
                     pcr.unit_reported, 
                     ex.name,

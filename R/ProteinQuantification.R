@@ -18,7 +18,8 @@ globalVariables(c("subject_id", "result_id", "experiment_title", "assay_purpose"
                   "treatment_temperature_value", "treatment_temperature_unit",
                   "visit_name", "visit_min_start_day", "visit_max_start_day", "visit_order",
                   "elapsed_time_of_specimen_collection", "time_point_reference",
-                  "biosample_accession", "experiment_sample_accession", "file_name", "concentration_value", "concentration_unit", 
+                  "biosample_accession", "experiment_sample_accession", "file_name", 
+                  "concentration_value_preferred", "concentration_unit_preferred", "concentration_value_reported", "concentration_unit_reported", 
                   "mfi", "mfi_coordinate", "QNAM", "QVAL", "ZAMFI", "ZAMFICRD", "ZASPECSB", "ZAREFIDP",
                   "VISITMIN", "VISITMAX",
                   "ZASPTRT", 
@@ -135,8 +136,8 @@ getProteinQuantification <- function(data_src, study_id, assay_type="ALL") {
         if (nrow(mbaa_df) > 0) {
             mbaa_df <- mbaa_df %>% 
               select(STUDYID = study_id, USUBJID = subject_id, ZASEQ = sequence, ZATEST = experiment_title, 
-                ZACAT = assay_purpose, ZAMETHOD = measurement_technique, ZAANALYT = analyte, ZAORRES = concentration_value, 
-                ZAORRESU = concentration_unit, ZASPEC = specimen_type, ZASPECSB = specimen_subtype, 
+                ZACAT = assay_purpose, ZAMETHOD = measurement_technique, ZAANALYT = analyte, ZAORRES = concentration_value_preferred, 
+                ZAORRESU = concentration_unit_preferred, ZASPEC = specimen_type, ZASPECSB = specimen_subtype, 
                 ZASPTRT = specimen_treatment, 
                 ZATRTAMV = treatment_amount_value, ZATRTAMU = treatment_amount_unit,
                 ZATRTDUV = treatment_duration_value, ZATRTDUU = treatment_duration_unit,

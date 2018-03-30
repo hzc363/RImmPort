@@ -197,18 +197,12 @@ db_table_stmts <- c(
   `description` VARCHAR(1000) NULL DEFAULT NULL ,
   `link` VARCHAR(2000) NULL DEFAULT NULL ,
   PRIMARY KEY (`name`) )",
-  "CREATE  TABLE IF NOT EXISTS `lk_file_purpose` (
-  `name` VARCHAR(100) NOT NULL ,
-  `description` VARCHAR(1000) NULL DEFAULT NULL ,
-  `link` VARCHAR(2000) NULL DEFAULT NULL ,
-  PRIMARY KEY (`name`) )",
   "CREATE  TABLE IF NOT EXISTS `file_info` (
   `file_info_id` INT(11) NOT NULL ,
   `detail` VARCHAR(100) NOT NULL ,
   `filesize_bytes` INT(11) NOT NULL ,
   `name` VARCHAR(250) NOT NULL ,
   `original_file_name` VARCHAR(250) NOT NULL ,
-  `purpose` VARCHAR(100) NOT NULL ,
   `workspace_id` INT(11) NULL DEFAULT NULL ,
   PRIMARY KEY (`file_info_id`) ,
   CONSTRAINT `fk_file_info_1`
@@ -216,10 +210,7 @@ db_table_stmts <- c(
   REFERENCES `workspace` (`workspace_id` ),
   CONSTRAINT `fk_file_info_2`
   FOREIGN KEY (`detail` )
-  REFERENCES `lk_file_detail` (`name` ),
-  CONSTRAINT `fk_file_info_3`
-  FOREIGN KEY (`purpose` )
-  REFERENCES `lk_file_purpose` (`name` ))",
+  REFERENCES `lk_file_detail` (`name` ))",
   "CREATE  TABLE IF NOT EXISTS `assessment_panel` (
   `assessment_panel_accession` VARCHAR(15) NOT NULL ,
   `assessment_type` VARCHAR(125) NULL DEFAULT NULL ,
@@ -507,11 +498,6 @@ db_table_stmts <- c(
   CONSTRAINT `fk_contract_2_study_3`
   FOREIGN KEY (`study_accession` )
   REFERENCES `study` (`study_accession` ))",
-  "CREATE  TABLE IF NOT EXISTS `lk_experiment_purpose` (
-  `name` VARCHAR(50) NOT NULL ,
-  `description` VARCHAR(1000) NULL DEFAULT NULL ,
-  `link` VARCHAR(2000) NULL DEFAULT NULL ,
-  PRIMARY KEY (`name`) )",
   "CREATE  TABLE IF NOT EXISTS `lk_exp_measurement_tech` (
   `name` VARCHAR(50) NOT NULL ,
   `description` VARCHAR(1000) NULL DEFAULT NULL ,
@@ -1062,17 +1048,13 @@ db_table_stmts <- c(
   REFERENCES `lk_compound_role` (`name` ))",
   "CREATE  TABLE IF NOT EXISTS `kir_typing_result` (
   `result_id` INT(11) NOT NULL ,
-  `allele` VARCHAR(500) NULL DEFAULT NULL ,
-  `ancestral_population` VARCHAR(250) NOT NULL ,
+  `allele_1` VARCHAR(500) NULL DEFAULT NULL ,
+  `allele_2` VARCHAR(500) NULL DEFAULT NULL ,
   `arm_accession` VARCHAR(15) NOT NULL ,
   `biosample_accession` VARCHAR(15) NOT NULL ,
   `comments` VARCHAR(500) NULL DEFAULT NULL ,
-  `copy_number` INT(11) NULL DEFAULT NULL ,
   `experiment_accession` VARCHAR(15) NOT NULL ,
   `expsample_accession` VARCHAR(15) NOT NULL ,
-  `gene_name` VARCHAR(25) NOT NULL ,
-  `present_absent` VARCHAR(10) NULL DEFAULT NULL ,
-  `result_set_id` INT(11) NOT NULL ,
   `study_accession` VARCHAR(15) NOT NULL ,
   `study_time_collected` FLOAT NULL DEFAULT NULL ,
   `study_time_collected_unit` VARCHAR(25) NULL DEFAULT NULL ,
@@ -1122,8 +1104,8 @@ db_table_stmts <- c(
   PRIMARY KEY (`name`) )",
   "CREATE  TABLE IF NOT EXISTS `lab_test` (
   `lab_test_accession` VARCHAR(15) NOT NULL ,
-  `biosample_accession` VARCHAR(15) NULL DEFAULT NULL ,
   `lab_test_panel_accession` VARCHAR(15) NOT NULL ,
+  `biosample_accession` VARCHAR(15) NULL DEFAULT NULL ,
   `name_preferred` VARCHAR(40) NULL DEFAULT NULL ,
   `name_reported` VARCHAR(125) NULL DEFAULT NULL ,
   `reference_range_accession` VARCHAR(15) NULL DEFAULT NULL ,
@@ -1160,36 +1142,18 @@ db_table_stmts <- c(
   REFERENCES `lab_test_panel` (`lab_test_panel_accession` ))",
   "CREATE  TABLE IF NOT EXISTS `lk_analyte` (
   `analyte_accession` VARCHAR(15) NOT NULL ,
-  `analyte_preferred` VARCHAR(100) NOT NULL ,
-  `cluster_subunit_gene_ids` VARCHAR(1000) NULL DEFAULT NULL ,
-  `cluster_subunit_gene_symbols` VARCHAR(1000) NULL DEFAULT NULL ,
-  `cluster_subunit_uniprot_ids` VARCHAR(1000) NULL DEFAULT NULL ,
-  `cluster_subunit_uniprot_names` TEXT NULL DEFAULT NULL ,
-  `gene_additional_names` TEXT NULL DEFAULT NULL ,
   `gene_aliases` TEXT NULL DEFAULT NULL ,
   `gene_id` VARCHAR(10) NULL DEFAULT NULL ,
   `genetic_nomenclature_id` VARCHAR(15) NULL DEFAULT NULL ,
   `immunology_gene_symbol` VARCHAR(100) NULL DEFAULT NULL ,
-  `ix_synonyms` TEXT NULL DEFAULT NULL ,
   `link` VARCHAR(2000) NULL DEFAULT NULL ,
-  `mesh_id` VARCHAR(10) NULL DEFAULT NULL ,
-  `mesh_name` VARCHAR(255) NULL DEFAULT NULL ,
   `official_gene_name` VARCHAR(255) NULL DEFAULT NULL ,
-  `omim_id` VARCHAR(50) NULL DEFAULT NULL ,
-  `ortholog_ids` VARCHAR(100) NULL DEFAULT NULL ,
   `protein_ontology_id` VARCHAR(15) NULL DEFAULT NULL ,
   `protein_ontology_name` VARCHAR(100) NULL DEFAULT NULL ,
   `protein_ontology_synonyms` TEXT NULL DEFAULT NULL ,
-  `protein_ontology_url` VARCHAR(500) NULL DEFAULT NULL ,
-  `shen_orr_id` VARCHAR(10) NULL DEFAULT NULL ,
   `taxonomy_id` VARCHAR(10) NULL DEFAULT NULL ,
-  `typographical_variations` VARCHAR(1000) NULL DEFAULT NULL ,
-  `uniprot_alt_prot_names` TEXT NULL DEFAULT NULL ,
-  `uniprot_id` VARCHAR(20) NULL DEFAULT NULL ,
-  `uniprot_protein_name` VARCHAR(255) NULL DEFAULT NULL ,
-  `unique_id` VARCHAR(10) NULL DEFAULT NULL ,
   PRIMARY KEY (`analyte_accession`) )",
-  "CREATE UNIQUE INDEX `idx_lk_analyte_1` ON `lk_analyte` (`analyte_preferred` ASC)",
+  "CREATE UNIQUE INDEX `idx_lk_analyte_1` ON `lk_analyte` (`analyte_accession` ASC)",
   "CREATE  TABLE IF NOT EXISTS `lk_ancestral_population` (
   `name` VARCHAR(30) NOT NULL ,
   `abbreviation` VARCHAR(3) NULL DEFAULT NULL ,
@@ -1200,21 +1164,6 @@ db_table_stmts <- c(
   `name` VARCHAR(150) NOT NULL ,
   `comments` VARCHAR(500) NULL DEFAULT NULL ,
   `definition` VARCHAR(150) NULL DEFAULT NULL ,
-  `description` VARCHAR(1000) NULL DEFAULT NULL ,
-  `link` VARCHAR(2000) NULL DEFAULT NULL ,
-  PRIMARY KEY (`name`) )",
-  "CREATE  TABLE IF NOT EXISTS `lk_kir_gene` (
-  `name` VARCHAR(50) NOT NULL ,
-  `description` VARCHAR(1000) NULL DEFAULT NULL ,
-  `link` VARCHAR(2000) NULL DEFAULT NULL ,
-  PRIMARY KEY (`name`) )",
-  "CREATE  TABLE IF NOT EXISTS `lk_kir_locus` (
-  `name` VARCHAR(50) NOT NULL ,
-  `description` VARCHAR(250) NULL DEFAULT NULL ,
-  `link` VARCHAR(2000) NULL DEFAULT NULL ,
-  PRIMARY KEY (`name`) )",
-  "CREATE  TABLE IF NOT EXISTS `lk_kir_present_absent` (
-  `name` VARCHAR(50) NOT NULL ,
   `description` VARCHAR(1000) NULL DEFAULT NULL ,
   `link` VARCHAR(2000) NULL DEFAULT NULL ,
   PRIMARY KEY (`name`) )",
@@ -1269,8 +1218,10 @@ db_table_stmts <- c(
   `assay_id` VARCHAR(100) NULL DEFAULT NULL ,
   `biosample_accession` VARCHAR(15) NULL DEFAULT NULL ,
   `comments` VARCHAR(500) NULL DEFAULT NULL ,
-  `concentration_unit` VARCHAR(100) NULL DEFAULT NULL ,
-  `concentration_value` VARCHAR(100) NULL DEFAULT NULL ,
+  `concentration_unit_reported` VARCHAR(100) NULL DEFAULT NULL ,
+  `concentration_unit_preferred` VARCHAR(100) NULL DEFAULT NULL ,
+  `concentration_value_reported` VARCHAR(100) NULL DEFAULT NULL ,
+  `concentration_value_preferred` VARCHAR(100) NULL DEFAULT NULL ,
   `experiment_accession` VARCHAR(15) NOT NULL ,
   `mfi` VARCHAR(100) NULL DEFAULT NULL ,
   `mfi_coordinate` VARCHAR(100) NULL DEFAULT NULL ,
@@ -1358,7 +1309,8 @@ db_table_stmts <- c(
   `expsample_accession` VARCHAR(15) NOT NULL ,
   `gene_id` VARCHAR(10) NULL DEFAULT NULL ,
   `gene_name` VARCHAR(4000) NULL DEFAULT NULL ,
-  `gene_symbol` VARCHAR(100) NULL DEFAULT NULL ,
+  `gene_symbol_preferred` VARCHAR(100) NULL DEFAULT NULL ,
+  `gene_symbol_reported` VARCHAR(100) NULL DEFAULT NULL ,
   `other_gene_accession` VARCHAR(250) NULL DEFAULT NULL ,
   `study_accession` VARCHAR(15) NOT NULL ,
   `study_time_collected` FLOAT NULL DEFAULT NULL ,
@@ -1691,7 +1643,6 @@ db_index_stmts <- c(
   "CREATE INDEX `idx_file_info_file_info_id` ON `file_info` (`file_info_id` ASC)",
   "CREATE INDEX `idx_file_info_workspace` ON `file_info` (`workspace_id` ASC)",
   "CREATE INDEX `fk_file_info_2` ON `file_info` (`detail` ASC)",
-  "CREATE INDEX `fk_file_info_3` ON `file_info` (`purpose` ASC)",
   "CREATE INDEX `idx_assessment_panel_study` ON `assessment_panel` (`study_accession` ASC)",
   "CREATE INDEX `idx_assessment_panel_workspace` ON `assessment_panel` (`workspace_id` ASC)",
   "CREATE INDEX `idx_assessment_2_file_info` ON `assessment_2_file_info` (`file_info_id` ASC, `assessment_panel_accession` ASC)",
@@ -1917,10 +1868,9 @@ buildNewSqliteDb <- function(data_dir, db_dir) {
                db_dir, " before building a new ImmPort database"))
   }
   
-  sqldf(paste("attach \'", dbname, "\' as new", sep=""), drv = "SQLite") 
+  sqldf::sqldf(paste("attach \'", dbname, "\' as new", sep=""), drv = "SQLite") 
   
   db <- dbConnect(SQLite(), dbname)
-  
   for (i in db_table_stmts) {
     dbGetQuery(db, i)
   }
@@ -1937,6 +1887,8 @@ buildNewSqliteDb <- function(data_dir, db_dir) {
   }
   
   # process each study dir and load data into SQLite db
+  tableInDb = paste0(dbListTables(db),".txt")#zicheng mod
+  
   study_dirs <- list.files(pattern = "Tab$")
   for (sd in study_dirs) {
     study_dir <- file.path(data_dir, sd)
@@ -1953,7 +1905,8 @@ buildNewSqliteDb <- function(data_dir, db_dir) {
     cat("processing files of study dir = ", study_dir, "\n")
     files <- list.files(pattern = "\\.txt$")
     for (f in files) {
-      fname <- file_path_sans_ext(f)
+      if(!f%in% tableInDb){next}
+      fname <- tools::file_path_sans_ext(f)
       cat("processing file = ", fname, "\n")
       
       df <- read.table(f, sep="\t", header=TRUE, fill=TRUE, quote = "", stringsAsFactors = FALSE)
@@ -1963,7 +1916,8 @@ buildNewSqliteDb <- function(data_dir, db_dir) {
       tb_col_names <- dbListFields(conn = db, name = fname)
       #cat("tb_col_names = ", tolower(tb_col_names), "\n")
       #cat("df_col_names = ", tolower(colnames(df)), "\n")
-      
+      t1 = intersect(tolower(tb_col_names), tolower(colnames(df)))# zicheng mod
+      df = df[,t1]# zicheng mod
       if (all(tolower(tb_col_names) != tolower(colnames(df)))) {
          cat("column mismatch in ", fname, " file \n")
       }
@@ -1973,10 +1927,11 @@ buildNewSqliteDb <- function(data_dir, db_dir) {
         cat("column mismatch in ", fname, " file \n")
       }
       if ((substr(fname, 1,3) == "lk_") || (fname == "personnel") || 
-          (fname == "program_2_personnel") || (fname == "program"))
+          (fname == "program_2_personnel") || (fname == "program")){
         dbWriteTable(conn = db, name = fname, value = df, overwrite = TRUE, row.names = FALSE)
-      else
+      }else{
         dbWriteTable(conn = db, name = fname, value = df, append = TRUE, row.names = FALSE)
+      }
     }
   }
 
