@@ -34,7 +34,7 @@ getArrayResults <- function(conn, study_id, measurement_type) {
                     bs.biosample_accession, 
                     bs.type,
                     bs.subtype,
-                    pv.name,
+                    pv.name as name_2,
                     pv.min_start_day,
                     pv.max_start_day,
                     pv.order_number,
@@ -59,7 +59,7 @@ getArrayResults <- function(conn, study_id, measurement_type) {
                     WHERE 
                     bs.study_accession in (\'", study_id,"\') AND
                     es2fi.file_info_id = fi.file_info_id AND
-                    fi.purpose like \"%Gene_Expression%\" AND
+                    fi.detail like \"%Gene expression%\" AND
                     LOWER(fi.name) like \"%.cel%\"
                     ORDER BY bs.subject_accession",sep="")
   
@@ -79,7 +79,7 @@ getArrayResults <- function(conn, study_id, measurement_type) {
                          bs.biosample_accession, 
                          bs.type,
                          bs.subtype,
-                         pv.name,
+                         pv.name as name_2,
                          pv.min_start_day,
                          pv.max_start_day,
                          pv.order_number,
@@ -120,7 +120,7 @@ getArrayResults <- function(conn, study_id, measurement_type) {
                         bs.biosample_accession, 
                         bs.type,
                         bs.subtype,
-                        pv.name,
+                        pv.name as name_2,
                         pv.min_start_day,
                         pv.max_start_day,
                         pv.order_number,
@@ -145,7 +145,7 @@ getArrayResults <- function(conn, study_id, measurement_type) {
                         WHERE 
                         bs.study_accession in (\'", study_id,"\') AND
                         es2fi.file_info_id = fi.file_info_id AND
-                        fi.purpose like \"%Gene_Expression%\" 
+                        fi.detail like \"%Gene expression%\" 
                         ORDER BY bs.subject_accession",sep="")
       
       

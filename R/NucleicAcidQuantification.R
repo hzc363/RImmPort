@@ -11,7 +11,7 @@ NULL
 # call to globalVariables to prevent from generating NOTE: no visible binding for global variable <variable name>
 # this hack is to satisfy CRAN (http://stackoverflow.com/questions/9439256/how-can-i-handle-r-cmd-check-no-visible-binding-for-global-variable-notes-when)
 globalVariables(c("subject_id", "experiment_title", "assay_purpose", "measurement_technique",
-                  "entrez_gene_id", "gene_name", "gene_symbol",
+                  "entrez_gene_id", "gene_name", "gene_symbol_preferred","gene_symbol_reported",
                   "value_reported", "unit_reported", "specimen_type",
                   "specimen_subtype", "specimen_treatment", 
                   "treatment_amount_value", "treatment_amount_unit",
@@ -80,7 +80,7 @@ getNucleicAcidQuantification <- function(data_src, study_id, assay_type="ALL") {
       if (nrow(pcr_df) > 0) {
         pcr_df <- select(pcr_df, STUDYID = study_id, USUBJID = subject_id, ZCSEQ = sequence, ZCTEST = experiment_title, 
                          ZCCAT = assay_purpose, ZCMETHOD = measurement_technique, 
-                         ZCENTRZD = entrez_gene_id, ZCGENNAM = gene_name, ZCGENSYM = gene_symbol,
+                         ZCENTRZD = entrez_gene_id, ZCGENNAM = gene_name, ZCGENSYM = gene_symbol_preferred,
                          ZCORRES = value_reported, ZCORRESU = unit_reported,
                          ZCSPEC = specimen_type, ZCSPECSB = specimen_subtype,
                          ZCSPTRT = specimen_treatment, 
